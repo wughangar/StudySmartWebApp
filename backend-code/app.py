@@ -1,11 +1,16 @@
-from flask import Flask, jsonify, request, session
-from db import mydb
-import bcrypt
 import os
 
+import bcrypt
+from flask import Flask, jsonify, request, session
+
+# from flask_mail import Mail, Message
+from db import mydb
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+MIN_USERNAME_LENGTH = 3
+MAX_USERNAME_LENGTH = 20
+MIN_PASSWORD_LENGTH = 6
 
 @app.before_request
 def before_request():
@@ -25,18 +30,29 @@ def signup():
     user_data = request.get_json()
     username = user_data.get("username")
     password = user_data.get("password")
+    email = user_data.get("email")
+    if len(username) <= MIN_USERNAME_LENGTH:
+        return jsonify({'message': f'Username should be more than {MIN_USERNAME_LENGTH} characters.'}), 400
 
-   
+    if len(password) <= MIN_PASSWORD_LENGTH:
+        return jsonify({"message": f"Password should be more than {MIN_PASSWORD_LENGTH} characters."}), 400
+
+    if '@' not in email or '.' not in email:
+        return jsonify({"message": "Invalid email address."}), 400
+
     existing_user = users_collection.find_one({"username": username})
     if existing_user:
         return jsonify({"message": "Username already exists"}), 400
+    
+    #verification_token = generate_verification_token()
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     
     new_user = {"username": username,
-                "password": hashed_password.decode('utf-8')}  
+                "password": hashed_password.decode('utf-8'),
+                "email": email}  
     users_collection.insert_one(new_user)
-    return jsonify({"message": "Signup successful"}), 201
+    return jsonify({"message": "Signup successfull"}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -57,6 +73,8 @@ def login():
     else:
         return jsonify({"message": "invalid credentials"}), 401
 
+
+
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop("username", None)
@@ -67,4 +85,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
