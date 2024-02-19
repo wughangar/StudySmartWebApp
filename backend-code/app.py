@@ -1,9 +1,16 @@
-from flask import Flask, jsonify, request 
+from flask import Flask, jsonify, request, session
 from db import mydb
 import bcrypt
+import os
 
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
+@app.before_request
+def before_request():
+    if 'username' not in session and request.endpoint not in ['hello', 'signup', 'logout', 'login']:
+        return jsonify({'message': 'Please login'})
 
 users_collection = mydb["users"]
 
@@ -43,11 +50,18 @@ def login():
         hashed_password = user["password"]
         
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+            session["username"] = username
             return jsonify({"message": "login successful"}), 200
         else:
             return jsonify({"message": "invalid credentials"}), 401
     else:
         return jsonify({"message": "invalid credentials"}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop("username", None)
+    return jsonify({"message": "logout successful"}), 200
+    
 
 
 
