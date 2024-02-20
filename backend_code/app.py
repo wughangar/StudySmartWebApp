@@ -2,7 +2,8 @@ import os
 
 import bcrypt
 from flask import Flask, jsonify, request, session
-
+from routes.goals import goals_bp 
+from routes.summary import  summary_bp
 # from flask_mail import Mail, Message
 from db import mydb
 
@@ -11,11 +12,15 @@ app.secret_key = os.urandom(24)
 MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
+app.register_blueprint(goals_bp)
+app.register_blueprint(summary_bp)
 
-@app.before_request
-def before_request():
-    if 'username' not in session and request.endpoint not in ['hello', 'signup', 'logout', 'login']:
-        return jsonify({'message': 'Please login'})
+
+
+#@app.before_request
+#def before_request():
+#    if 'username' not in session and request.endpoint not in ['hello', 'signup', 'logout', 'login', 'goals']:
+#        return jsonify({'message': 'Please login'})
 
 users_collection = mydb["users"]
 
@@ -74,12 +79,13 @@ def login():
         return jsonify({"message": "invalid credentials"}), 401
 
 
-
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop("username", None)
     return jsonify({"message": "logout successful"}), 200
-    
+
+
+  
 
 
 

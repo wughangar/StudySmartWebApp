@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from backend_code.db import mydb  
+from backend_code.db import mydb 
+from bson import ObjectId
 goals_bp = Blueprint('goals', __name__)
 
 # Route to set study goals
@@ -29,4 +30,10 @@ def get_goals(username):
     goals_collection = mydb["goals"] 
     goals = goals_collection.find_one({'username': username})
 
-    return jsonify(goals), 200 if goals else 404
+    if goals:
+        # Convert ObjectId to string
+        goals['_id'] = str(goals['_id'])
+        return jsonify(goals), 200
+    else:
+        return jsonify({"message": "Study goals not found for the current week"}), 404
+
