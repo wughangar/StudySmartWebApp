@@ -2,11 +2,10 @@ import os
 
 import bcrypt
 from flask import Flask, jsonify, request, session, render_template, send_from_directory
-from routes.goals import goals_bp 
-from routes.summary import  summary_bp
-# from flask_mail import Mail, Message
-from db import mydb
-from routes.tweet import  daily_tweet_bp 
+from backend_code.routes.goals   import goals_bp 
+from backend_code.routes.summary import  summary_bp
+from backend_code.db  import mydb
+from backend_code.routes.tweet import  daily_tweet_bp 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -16,6 +15,7 @@ MIN_PASSWORD_LENGTH = 6
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
+
 
 
 #@app.before_request

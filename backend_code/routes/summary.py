@@ -26,7 +26,7 @@ def save_summary():
     return jsonify({"message": "Summary saved successfully"}), 200
 
 
-@summary_bp.route('/summary/<topic>', methods=['GET'])
+@summary_bp.route('/<topic>', methods=['GET'])
 def get_summary(topic):
     # Retrieve the summary for the specified topic
     summary_collection = mydb["summary"]
@@ -48,7 +48,6 @@ def get_all_summaries():
             "summary": summary['summary']
         })
 
-    # Restructure the summary list to group summaries by topic
     grouped_summaries = {}
     for entry in summary_list:
         topic = entry['topic']
