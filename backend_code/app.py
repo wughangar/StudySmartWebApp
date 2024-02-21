@@ -6,6 +6,7 @@ from routes.goals import goals_bp
 from routes.summary import  summary_bp
 # from flask_mail import Mail, Message
 from db import mydb
+from routes.tweet import  daily_tweet_bp 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -14,7 +15,7 @@ MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
-
+app.register_blueprint(daily_tweet_bp)
 
 
 #@app.before_request
@@ -25,7 +26,7 @@ app.register_blueprint(summary_bp)
 users_collection = mydb["users"]
 
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
 def hello():
     return "Building first web-application!!"
 
@@ -91,4 +92,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
