@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from backend_code.db import mydb
 
+
 summary_bp = Blueprint('summary', __name__)
 
 MAX_SUMMARY_WORDS = 400

@@ -6,6 +6,7 @@ from backend_code.routes.goals   import goals_bp
 from backend_code.routes.summary import  summary_bp
 from backend_code.db  import mydb
 from backend_code.routes.tweet import  daily_tweet_bp 
+from backend_code.routes.chat import chat_bp
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -15,6 +16,7 @@ MIN_PASSWORD_LENGTH = 6
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
+app.register_blueprint(chat_bp)
 
 
 
@@ -29,6 +31,15 @@ users_collection = mydb["users"]
 @app.route('/')
 def hello():
     return render_template("index.html")
+
+@app.route('/signup', methods=['GET'])
+def signup_form():
+    return render_template("signup.html")
+
+@app.route('/learn', methods=['POST'])
+def learn():
+    return render_template("chat.py") 
+
 
 
 @app.route('/signup', methods=['POST'])
