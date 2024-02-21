@@ -1,7 +1,7 @@
 import os
 
 import bcrypt
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, render_template, send_from_directory
 from routes.goals import goals_bp 
 from routes.summary import  summary_bp
 # from flask_mail import Mail, Message
@@ -25,9 +25,9 @@ app.register_blueprint(summary_bp)
 users_collection = mydb["users"]
 
 
-@app.route('/', methods=['POST'])
+@app.route('/')
 def hello():
-    return "Building first web-application!!"
+    return render_template("index.html")
 
 
 @app.route('/signup', methods=['POST'])
@@ -85,10 +85,12 @@ def logout():
     return jsonify({"message": "logout successful"}), 200
 
 
-  
+@app.route('/static/<path:filename>')
+def custom_static(filename):
+    return send_from_directory(app.static_folder, filename)
 
 
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=9000, debug=True)
