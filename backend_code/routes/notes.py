@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key='your-api-key')
 
 notes_bp = Blueprint('notes', __name__)
 
 # Initialize GPT-3 API key
-openai.api_key = 'your-api-key'
 
 @notes_bp.route('/notes', methods=['POST'])
 def process_notes():
@@ -22,11 +23,9 @@ def process_notes():
 def process_notes_with_gpt(user_notes):
     # Call GPT-3 API to process user's notes
     # You can customize the prompt to specify what you want the model to do
-    gpt_response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=user_notes,
-        max_tokens=200
-    )
+    gpt_response = client.completions.create(engine="text-davinci-003",
+    prompt=user_notes,
+    max_tokens=200)
 
     # Extract the generated text from the GPT response
     processed_notes = gpt_response.choices[0].text.strip()
