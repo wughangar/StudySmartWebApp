@@ -1,12 +1,17 @@
 import React from 'react';
 import './App.css';
-import { Container, Row, Col } from 'react-bootstrap';
 
 import MainView from './components/MainView'
+import {StoreProvider} from './components/StoreProvider';
 
 
 function App() {
-    return MainView();
+
+    return (
+        <StoreProvider>
+            <MainView/>
+        </StoreProvider>
+    );
 }
 
 export default App;
