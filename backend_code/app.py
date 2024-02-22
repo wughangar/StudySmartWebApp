@@ -2,24 +2,34 @@ import os
 
 import bcrypt
 from flask import Flask, jsonify, request, session, render_template, send_from_directory
-from routes.goals import goals_bp 
-from routes.summary import  summary_bp
+
 # from flask_mail import Mail, Message
 from db import mydb
-from routes.tweet import  daily_tweet_bp 
+from routes.goals import goals_bp
+from routes.summary import summary_bp
+from routes.tweet import daily_tweet_bp
 
-app = Flask(__name__)
+# Set the frontend paths relative to this script's directory
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend_code')
+template_dir = os.path.join(frontend_dir, 'templates')
+static_dir = os.path.join(frontend_dir, 'static')
+js_dir = os.path.join(frontend_dir, 'js')
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
+# Set authentication parameters
 app.secret_key = os.urandom(24)
 MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
+
+# Register blueprints
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
 
-
-#@app.before_request
-#def before_request():
+# @app.before_request
+# def before_request():
 #    if 'username' not in session and request.endpoint not in ['hello', 'signup', 'logout', 'login', 'goals']:
 #        return jsonify({'message': 'Please login'})
 
@@ -49,16 +59,18 @@ def signup():
     existing_user = users_collection.find_one({"username": username})
     if existing_user:
         return jsonify({"message": "Username already exists"}), 400
-    
-    #verification_token = generate_verification_token()
+
+    # verification_token = generate_verification_token()
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    
+
     new_user = {"username": username,
                 "password": hashed_password.decode('utf-8'),
-                "email": email}  
+                "email": email}
+
     users_collection.insert_one(new_user)
-    return jsonify({"message": "Signup successfull"}), 201
+
+    return jsonify({"message": "Signup successful"}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -70,7 +82,7 @@ def login():
     user = users_collection.find_one({'username': username})
     if user:
         hashed_password = user["password"]
-        
+
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
             session["username"] = username
             return jsonify({"message": "login successful"}), 200
@@ -91,6 +103,9 @@ def custom_static(filename):
     return send_from_directory(app.static_folder, filename)
 
 
+@app.route('/js/<path:filename>')
+def custom_js(filename):
+    return send_from_directory(js_dir, filename)
 
 
 if __name__ == '__main__':
