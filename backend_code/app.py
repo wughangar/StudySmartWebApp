@@ -8,11 +8,21 @@ from backend_code.db  import mydb
 from backend_code.routes.tweet import  daily_tweet_bp 
 from backend_code.routes.chat import chat_bp
 
-app = Flask(__name__)
+# Set the frontend paths relative to this script's directory
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend_code')
+template_dir = os.path.join(frontend_dir, 'templates')
+static_dir = os.path.join(frontend_dir, 'static')
+js_dir = os.path.join(frontend_dir, 'js')
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
+# Set authentication parameters
 app.secret_key = os.urandom(24)
 MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
+
+# Register blueprints
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
@@ -102,6 +112,9 @@ def custom_static(filename):
     return send_from_directory(app.static_folder, filename)
 
 
+@app.route('/js/<path:filename>')
+def custom_js(filename):
+    return send_from_directory(js_dir, filename)
 
 
 if __name__ == '__main__':
