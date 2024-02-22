@@ -26,7 +26,7 @@ MIN_PASSWORD_LENGTH = 6
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
-app.register_blueprint(chat:wq_bp)
+app.register_blueprint(chatgit stta_bp)
 
 
 
