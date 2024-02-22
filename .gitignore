@@ -1,4 +1,5 @@
 .idea
 .venv
 *pycache*
-
+frontend_code/node_modules/
+frontend_code/package.json

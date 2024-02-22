@@ -1,6 +1,10 @@
 import requests
+from flask import Blueprint
+
+chats_bp = Blueprint('chats', __name__)
 
 api_key = "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"
+
 
 def test_openai_api(api_key):
     user_input = input("Enter your input: ")
@@ -11,7 +15,7 @@ def test_openai_api(api_key):
     }
 
     data = {
-        "model": "babbage-002",
+        "model": "text-davinci-002",
         "max_tokens": 150,
         "prompt": user_input
     }
