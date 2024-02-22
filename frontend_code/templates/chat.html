@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn and Converse</title>
+</head>
+<body>
+    <h1>Learn and Converse with GPT</h1>
+    <form id="learn-form">
+        <label for="user-input">Enter what you've learned:</label><br>
+        <textarea id="user-input" name="user-input" rows="4" cols="50"></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        // Function to handle form submission
+        document.getElementById("learn-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+            const userInput = document.getElementById("user-input").value; // Get user input
+            // Send user input to backend for processing
+            fetch('/learn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({user_input: userInput})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display GPT's response
+                document.getElementById("response").innerHTML = "<strong>GPT's Response:</strong> " + data.response;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
