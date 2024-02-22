@@ -1,20 +1,29 @@
-from openai import OpenAI
-from flask import jsonify, request, Blueprint
+import requests
 
-client = OpenAI(api_key="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")
-chat_bp = Blueprint('notes', __name__)
+api_key = "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"
 
-@chat_bp.route('/learn', methods=['POST'])
-def learn_and_converse():
-    user_input = request.json.get('user_input')
+def test_openai_api(api_key):
+    user_input = input("Enter your input: ")
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": user_input}
-        ]
-    )
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
 
-    gpt_response = response.choices[0].message.content
+    data = {
+        "model": "babbage-002",
+        "max_tokens": 150,
+        "prompt": user_input
+    }
 
-    return jsonify({"response": gpt_response})
+    response = requests.post("https://api.openai.com/v1/completions", json=data, headers=headers)
+
+    if response.status_code == 200:
+        result = response.json()
+        gpt_response = result['choices'][0]['text']
+        print("GPT-3 response:", gpt_response)
+    else:
+        print("Error:", response.text)
+
+if __name__ == "__main__":
+    test_openai_api(api_key)
