@@ -2,6 +2,9 @@ import os
 
 import bcrypt
 from flask import Flask, jsonify, request, session, render_template, send_from_directory
+from flask_mail import Mail 
+
+from backend_code.routes.facts import facts_bp
 from backend_code.routes.goals   import goals_bp 
 from backend_code.routes.summary import  summary_bp
 from backend_code.db  import mydb
@@ -22,11 +25,21 @@ MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
 
+#set email configurations
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'gurulifestyle13@gmail.com'
+app.config['MAIL_PASSWORD'] = 'pkxw ycgn tsbq xacn'
+mail = Mail(app)
+
+
 # Register blueprints
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
-app.register_blueprint(chatgit stta_bp)
+app.register_blueprint(chat_bp)
+app.register_blueprint(facts_bp)
 
 
 
