@@ -1,24 +1,29 @@
-import React, {createContext, useReducer, useState, useEffect} from "react";
+import React, {createContext} from "react";
 
 const initialState = {
-    user: "No User",
-    theme: "light",
+    user: null,
+    topic: null,
+    currentView: null
 };
 
 function reducer(state, action) {
     switch (action.type) {
         case "SET_USER":
-            console.log("SETTING USER!")
             return {
                 ...state,
-                ...action.payload,
+                user: action.payload,
             };
-        case "SET_THEME":
-            console.log("SETTING THEME!")
+        case "SET_TOPIC":
             return {
                 ...state,
-                ...action.payload,
+                focusedTopic: action.payload,
             };
+        case "SET_VIEW":
+            return {
+                ...state,
+                currentView: action.payload
+            }
+
         default:
             return state;
     }
@@ -26,20 +31,28 @@ function reducer(state, action) {
 
 export const AppContext = createContext(initialState);
 
-export const StoreProvider = ({children}) => {
-    const [state, dispatch] = useReducer(reducer,
-        // getting initialState from localStorage or falling back to default initialState
-        JSON.parse(window.localStorage.getItem('myContext')) || initialState
-    );
+export class StoreProvider extends React.Component {
+    constructor(props) {
+        super(props);
+        const storedState = JSON.parse(window.localStorage.getItem('myContext'));
+        this.state = storedState ? storedState : initialState;
+        this.dispatch = action => this.setState(state => reducer(state, action));
+    }
 
-    useEffect(() => {
-        // save to localStorage whenever state changes
-        window.localStorage.setItem('myContext', JSON.stringify(state));
-    }, [state]);
+    componentDidUpdate() {
+        window.localStorage.setItem('myContext', JSON.stringify(this.state));
+    };
 
-    return (
-        <AppContext.Provider value={{state, dispatch}}>
-            {children}
-        </AppContext.Provider>
-    );
+    render() {
+        return (
+            <AppContext.Provider value={
+                {
+                    state: this.state,
+                    dispatch: this.dispatch,
+                }
+            }>
+                {this.props.children}
+            </AppContext.Provider>
+        );
+    }
 };

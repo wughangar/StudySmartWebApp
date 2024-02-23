@@ -1,38 +1,42 @@
 import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
+import {AppContext} from "./StoreProvider";
+import TopicsList from "./TopicsList";
 
-const logo = process.env.PUBLIC_URL + '/logo512.png';
+class SiteSidebar extends React.Component
+{
+    static contextType = AppContext;
 
-const SiteSidebar = () => {
-    return (
-        <Container fluid className='bg-secondary p-2 m-0'>
-            <Row>
-                <Col>
-                    This is the sidebar
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    Some item 1
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    Some item 2
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    Some item 3
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    Some item 4
-                </Col>
-            </Row>
-        </Container>
-    )
+    render()
+    {
+        const {state} = this.context;
+        const {user}  = state;
+        
+        return (
+            <Container fluid className="bg-secondary p-2 m-0">
+                <Row>
+                    <Col>
+                        <p>{user.name}</p>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <a href="#" onClick={this.onAddNewTopicClicked}>Add new topic...</a>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <TopicsList/>
+                    </Col>
+                </Row>
+            </Container>
+        );
+    }
+
+    onAddNewTopicClicked()
+    {
+
+    }
 };
 
 export default SiteSidebar;

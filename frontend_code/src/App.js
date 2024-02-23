@@ -1,17 +1,21 @@
 import React from 'react';
 import './App.css';
 
-import MainView from './components/MainView'
+import MainView from './components/MainView';
 import {StoreProvider} from './components/StoreProvider';
 
+class App extends React.Component
+{
 
-function App() {
 
-    return (
-        <StoreProvider>
-            <MainView/>
-        </StoreProvider>
-    );
+    render()
+    {
+        return (
+            <StoreProvider>
+                <MainView/>
+            </StoreProvider>
+        );
+    }
 }
 
 export default App;
