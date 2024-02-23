@@ -11,7 +11,8 @@ fi
 
 pushd $FRONTEND_DIR > /dev/null
 
-npm build
+npm install
+
 npm start
 
 popd > /dev/null
