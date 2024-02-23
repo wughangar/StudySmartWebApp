@@ -11,8 +11,7 @@ from backend_code.routes.goals import goals_bp
 from backend_code.routes.summary import summary_bp
 from backend_code.db import mydb
 from backend_code.routes.tweet import daily_tweet_bp
-
-from backend_code.routes.chat import chats_bp
+from backend_code.routes.topics import topics_bp
 
 # Set the frontend paths relative to this script's directory
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend_code')
@@ -41,8 +40,7 @@ mail = Mail(app)
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
-app.register_blueprint(chats_bp)
-app.register_blueprint(facts_bp)
+app.register_blueprint(topics_bp)
 
 # @app.before_request
 # def before_request():
