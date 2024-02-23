@@ -26,7 +26,8 @@ function reducer(state, action) {
 
 export const AppContext = createContext(initialState);
 
-export const StoreProvider = ({children}) => {
+export const StoreProvider = ({children}) =>
+{
     const [state, dispatch] = useReducer(reducer,
         // getting initialState from localStorage or falling back to default initialState
         JSON.parse(window.localStorage.getItem('myContext')) || initialState
@@ -42,4 +43,5 @@ export const StoreProvider = ({children}) => {
             {children}
         </AppContext.Provider>
     );
-};
+}
+;
