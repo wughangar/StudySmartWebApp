@@ -7,6 +7,7 @@ import React, {Component} from 'react';
 import LoginPane from "./LoginPane";
 import DevView from "./DevView";
 import {setCurrentView} from "../common/context_interface";
+import RegisterNewUserPane from "./RegisterNewUserPane";
 
 class MainView extends Component
 {
@@ -16,13 +17,17 @@ class MainView extends Component
     {
         const {state}             = this.context;
         const {user, currentView} = state;
-        console.log(user, currentView);
 
-        if (currentView === 'login' && user != null)
+        if(currentView === 'login' && user != null)
         {
             setCurrentView(this.context, "default");
             this.setState({view: "default"});
 
+        }
+        else if(currentView === "register")
+        {
+            setCurrentView(this.context, "register");
+            this.setState({view: "register"});
         }
         else
         {
@@ -31,7 +36,7 @@ class MainView extends Component
             this.setState({view: view});
         }
 
-        this.setState({view: "default"});
+        //this.setState({view: "default"});
     }
 
     render()
@@ -40,14 +45,15 @@ class MainView extends Component
         {
             return null;
         }
-        
+
         const {view} = this.state;
         const {user} = this.context.state;
-        
+
         let contentArea = null;
         let sidebarArea = null;
-        
-        if (user != null && view === "default")
+
+        console.log("NEW VIEW: ", view)
+        if(user != null && view === "default")
         {
             contentArea = <ContentArea/>;
             sidebarArea = (
@@ -56,7 +62,11 @@ class MainView extends Component
                 </Col>
             );
         }
-        else 
+        else if(view === "register")
+        {
+            contentArea = <RegisterNewUserPane/>
+        }
+        else
         {
             contentArea = <LoginPane/>;
         }

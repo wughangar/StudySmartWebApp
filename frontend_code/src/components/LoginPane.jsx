@@ -1,9 +1,9 @@
 import React from "react";
 import '../css/bootstrap.min.css';
 import {AppContext} from "./StoreProvider";
-import {getUserFromDB, validateUser} from "../common/db_interface";
+import {getUserFromDB, loginUser} from "../common/db_interface";
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
-import {setCurrentUser} from "../common/context_interface";
+import {setCurrentUser, setCurrentView} from "../common/context_interface";
 
 class LoginPane extends React.Component
 {
@@ -38,7 +38,7 @@ class LoginPane extends React.Component
         event.preventDefault();
         const {username, password} = this.state;
 
-        if (validateUser(username, password))
+        if (loginUser(username, password))
         {
             this.setState({...this.state, errorMsg: null});
         }
@@ -84,13 +84,20 @@ class LoginPane extends React.Component
                                 <Form.Control type="password" onChange={this.handlePasswordChange} value={password}/>
                             </Form.Group>
                             <Button variant="primary" type="submit" disabled={!submitButtonEnabled}>Submit</Button>
+                            &nbsp;&nbsp;&nbsp;Or <a href={"#"} onClick={this.onRegisterClicked}>Register</a>...
                         </Form>
-
                     </Col>
+                    
                 </Row>
                 {errorSection}
             </Container>
         );
+    }
+
+    onRegisterClicked = () =>
+    {
+        setCurrentView(this.context, "register")
+        console.log("SET REGISTER")
     }
 }
 

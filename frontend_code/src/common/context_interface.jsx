@@ -40,3 +40,9 @@ export const setCurrentView = (context, viewName) =>
         });
 
 };
+
+export const logout = (context) =>
+{
+    setCurrentUser(context, null)
+    setCurrentView(context, "login")
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
 import TopicsList from "./TopicsList";
+import {logout} from "../common/context_interface";
 
 class SiteSidebar extends React.Component
 {
@@ -16,7 +17,7 @@ class SiteSidebar extends React.Component
             <Container fluid className="bg-secondary p-2 m-0">
                 <Row>
                     <Col>
-                        <p>{user.name}</p>
+                        <p>{user.name} [<a href={"#"} onClick={this.onLogoutClicked}>Logout</a>]</p>
                     </Col>
                 </Row>
                 <Row>
@@ -37,6 +38,11 @@ class SiteSidebar extends React.Component
     {
 
     }
-};
+
+    onLogoutClicked = () =>
+    {
+        logout(this.context)
+    }
+}
 
 export default SiteSidebar;

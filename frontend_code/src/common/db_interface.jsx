@@ -1,8 +1,9 @@
 export const getUserFromDB = (username = null, userid = null) =>
 {
-
     // TODO: Implement this
-    if (username == null && userid == null)
+
+
+    if(username == null && userid == null)
     {
         // return null;
     }
@@ -10,10 +11,10 @@ export const getUserFromDB = (username = null, userid = null) =>
     return getTestUserFromDB();
 };
 
-export const validateUser = (username, password) =>
+export const loginUser = (username, password) =>
 {
-
     // TODO: Implement this
+
     return true;
 };
 
@@ -28,16 +29,39 @@ export const doesUserHaveTopics = (userid) =>
 {
     const topics = getTopicsForUser(userid);
 
-    if (!topics)
+    if(!topics)
     {
         return false;
     }
 
-    if (topics.length === 0)
-    {
-        return false;
-    }
+    return topics.length > 0;
+};
 
+
+export const registerUser = (username, password, email, name) =>
+{
+    const url  = '/signup';
+    const data = {
+        username: username,
+        password: password,
+        email: email,
+        name: name,
+    };
+
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(response => response.json())
+        .catch((error) =>
+               {
+                   console.error('Error:', error);
+                   
+               });
 };
 
 /*********************************************************************/
