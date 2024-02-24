@@ -123,10 +123,10 @@ export const getTestListOfTopicsForTestUser = () =>
             'topic_id': "1",
             'title': 'Learn strings in python',
             'owner_user_id': "12345",
-            'generated_summary': `In Python, strings are sequences of characters, which makes them similar to lists and tuples, and they are declared by enclosing a character sequence within single or double-quotes. Python also supports multi-line strings that can be declared using triple quotes, either ''' or """.
+            'generated_summary': `In Python, \n\n\n\nstrings are sequences of characters, which makes them similar to lists and tuples, and they are declared by enclosing a character sequence within single or double-quotes. Python also supports multi-line strings that can be declared using triple quotes, either ''' or """.
 Python strings are immutable, meaning they cannot be changed after they are created. Because of this, operations on strings like adding and replicating create new string objects.
 Python provides several built-in methods that can perform operations on strings such as lowercase, uppercase, splitting, stripping, replacing, and more.
-Strings can be indexed and sliced to access parts of the string, using a similar notation as lists.
+Strings can be indexed and sliced to access parts of the string, using a similar notation as lists.\n
 String formatting can be done in various ways. Python provides methods such as the format() method or f-strings (since Python 3.6) to embed expressions inside string literals for formatting.
 Python also supports Unicode to handle a wide range of characters from different scripts, which can be encoded in various ways such as UTF-8, UTF-16, etc.
 A deep understanding of strings is important for handling and manipulating textual data in Python.`,

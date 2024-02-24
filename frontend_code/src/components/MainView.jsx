@@ -39,11 +39,11 @@ class MainView extends Component
     render()
     {
         const {currentView, user} = this.context.state;
-        
+
         let contentArea = null;
         let sidebarArea = null;
-    
-        console.log(`MAIN VIEW: ${currentView}`)
+
+        console.log(`MAIN VIEW: ${currentView}`);
         if(user != null && currentView === "default")
         {
             contentArea = <ContentArea/>;
@@ -59,7 +59,7 @@ class MainView extends Component
         }
         else if(currentView === "createNewTopic")
         {
-            contentArea = <CreateNewTopicPane/>
+            contentArea = <CreateNewTopicPane/>;
         }
         else
         {

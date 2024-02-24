@@ -2,17 +2,17 @@ import React from 'react';
 import {Button, Col, Container, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
 import {isLoggedIn, setCurrentUser} from "../common/context_interface";
-import {getTestUserFromDB, getUserFromDB} from "../common/backend_interface";
+import {getTestUserFromDB} from "../common/backend_interface";
 
 class DevView extends React.Component
 {
     static contextType = AppContext;
 
     SHOW = true;
-    
+
     devLoginBtnClicked = () =>
     {
-        const testUser = getTestUserFromDB()
+        const testUser = getTestUserFromDB();
         setCurrentUser(this.context, testUser);
     };
 
@@ -30,26 +30,26 @@ class DevView extends React.Component
 
         return (
             <>
-            <Container fluid className="card card-body mt-5" style={{
-                backgroundColor: "#110000", border: "1px solid #ff0000",
-            }}>
-                <Row>
-                </Row>
-                <Row className="mb-1">
-                    <Col>
-                        <p>These are development tools, remove before publishing to the public</p>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Button onClick={this.devLoginBtnClicked} disabled={isLoggedIn(this.context)}>DEV:
-                            Login</Button>
-                        <Button onClick={this.devLogoutBtnClicked} disabled={!isLoggedIn(this.context)}>DEV:
-                            Logout</Button>
-                        <Button onClick={this.clearBrowserDataClicked}>Clear Browser Data</Button>
-                    </Col>
-                </Row>
-            </Container>
+                <Container fluid className="card card-body mt-5" style={{
+                    backgroundColor: "#110000", border: "1px solid #ff0000",
+                }}>
+                    <Row>
+                    </Row>
+                    <Row className="mb-1">
+                        <Col>
+                            <p>These are development tools, remove before publishing to the public</p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Button onClick={this.devLoginBtnClicked} disabled={isLoggedIn(this.context)}>DEV:
+                                Login</Button>
+                            <Button onClick={this.devLogoutBtnClicked} disabled={!isLoggedIn(this.context)}>DEV:
+                                Logout</Button>
+                            <Button onClick={this.clearBrowserDataClicked}>Clear Browser Data</Button>
+                        </Col>
+                    </Row>
+                </Container>
             </>
         );
     }

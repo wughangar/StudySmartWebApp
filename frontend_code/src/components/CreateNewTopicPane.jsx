@@ -7,7 +7,7 @@ import {AppContext} from "./StoreProvider";
 class CreateNewTopicPane extends React.Component
 {
     static contextType = AppContext;
-    
+
     constructor(props)
     {
         super(props);
@@ -123,7 +123,7 @@ class CreateNewTopicPane extends React.Component
                         />
                         <hr className="bg-primary" style={{height: '4px'}}/>
                     </Col>
-                    
+
                 </Row>
                 {bestSummaryRow}
 
@@ -164,7 +164,7 @@ class CreateNewTopicPane extends React.Component
                     </Col>
                 </Row>
                 <Row className="mt-1">
-                    
+
                     <Col>
                         <hr className="bg-primary" style={{height: '4px'}}/>
                         <Button variant="primary"
@@ -189,8 +189,8 @@ class CreateNewTopicPane extends React.Component
 
     handleCancel = () =>
     {
-        popLastState(this.context)
-    }
+        popLastState(this.context);
+    };
 }
 
 export default CreateNewTopicPane;

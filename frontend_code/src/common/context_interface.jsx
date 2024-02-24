@@ -50,7 +50,6 @@ export const popLastState = (context) =>
             type: "POP_STATE",
             payload: null,
         });
-
 };
 
 
