@@ -7,6 +7,8 @@ export const setCurrentUser = (context, userObj) =>
             type: "SET_USER",
             payload: userObj,
         });
+    
+    setCurrentView(context, "default")
 };
 
 export const getCurrentUser = (context) =>

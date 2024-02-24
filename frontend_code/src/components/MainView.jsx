@@ -6,65 +6,59 @@ import {AppContext} from './StoreProvider';
 import React, {Component} from 'react';
 import LoginPane from "./LoginPane";
 import DevView from "./DevView";
-import {setCurrentView} from "../common/context_interface";
 import RegisterNewUserPane from "./RegisterNewUserPane";
+import CreateNewTopicPane from "./CreateNewTopicPane";
+import SiteFooter from "./SiteFooter";
+
 
 class MainView extends Component
 {
     static contextType = AppContext;
 
+    // Update local state when context changes
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            localState: this.context,
+        };
+    }
+
     componentDidMount()
     {
-        const {state}             = this.context;
-        const {user, currentView} = state;
+    }
 
-        if(currentView === 'login' && user != null)
+    componentDidUpdate(prevProps, newProps, something)
+    {
+        if(this.context !== this.state.localState)
         {
-            setCurrentView(this.context, "default");
-            this.setState({view: "default"});
-
+            this.setState({localState: this.context});
         }
-        else if(currentView === "register")
-        {
-            setCurrentView(this.context, "register");
-            this.setState({view: "register"});
-        }
-        else
-        {
-            const view = user != null ? currentView : "login";
-            setCurrentView(this.context, view);
-            this.setState({view: view});
-        }
-
-        //this.setState({view: "default"});
     }
 
     render()
     {
-        if(this.state === null)
-        {
-            return null;
-        }
-
-        const {view} = this.state;
-        const {user} = this.context.state;
-
+        const {currentView, user} = this.context.state;
+        
         let contentArea = null;
         let sidebarArea = null;
 
-        console.log("NEW VIEW: ", view)
-        if(user != null && view === "default")
+        if(user != null && currentView === "default")
         {
             contentArea = <ContentArea/>;
             sidebarArea = (
-                <Col className={' m-0 p-1'} md={3}>
+                <Col className={'m-0 p-1'} md={3}>
                     <SiteSidebar/>
                 </Col>
             );
         }
-        else if(view === "register")
+        else if(currentView === "register")
         {
-            contentArea = <RegisterNewUserPane/>
+            contentArea = <RegisterNewUserPane/>;
+        }
+        else if(currentView === "createNewTopic")
+        {
+            contentArea = <CreateNewTopicPane/>
         }
         else
         {
@@ -83,6 +77,11 @@ class MainView extends Component
                     {sidebarArea}
                     <Col className={' m-0 p-1'} md={9}>
                         {contentArea}
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <SiteFooter/>
                     </Col>
                 </Row>
                 <Row>

@@ -1,8 +1,9 @@
 import React from "react";
 import ListGroup from 'react-bootstrap/ListGroup';
-import {getTopicsForUser} from "../common/db_interface";
+import {getTopicsForUser} from "../common/backend_interface";
 import {AppContext} from "./StoreProvider";
 import {setCurrentTopic} from "../common/context_interface";
+import {Col, Container, Row} from "react-bootstrap";
 
 class TopicsList extends React.Component
 {
@@ -28,7 +29,7 @@ class TopicsList extends React.Component
 
                               let bgColor = "white";
 
-                              if (focusedTopic != null && topic.topic_id === focusedTopic.topic_id)
+                              if(focusedTopic != null && topic.topic_id === focusedTopic.topic_id)
                               {
                                   bgColor = "lightgreen";
                               }
@@ -49,9 +50,15 @@ class TopicsList extends React.Component
     render()
     {
         return (
-            <ListGroup>
-                {this.renderList()}
-            </ListGroup>
+            <Container fluid><Row>
+                <Col>
+                    <ListGroup>
+                        {this.renderList()}
+                    </ListGroup>
+
+                </Col>
+
+            </Row></Container>
         );
     }
 

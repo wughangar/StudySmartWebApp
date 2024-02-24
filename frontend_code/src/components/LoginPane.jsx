@@ -1,7 +1,7 @@
 import React from "react";
 import '../css/bootstrap.min.css';
 import {AppContext} from "./StoreProvider";
-import {getUserFromDB, loginUser} from "../common/db_interface";
+import {getUserFromDB, loginUser} from "../common/backend_interface";
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {setCurrentUser, setCurrentView} from "../common/context_interface";
 
@@ -35,10 +35,10 @@ class LoginPane extends React.Component
 
     handleSubmit(event)
     {
-        event.preventDefault();
+        // event.preventDefault();
         const {username, password} = this.state;
 
-        if (loginUser(username, password))
+        if (loginUser(this.context, username, password))
         {
             this.setState({...this.state, errorMsg: null});
         }
@@ -47,7 +47,7 @@ class LoginPane extends React.Component
             this.setState({...this.state, errorMsg: "The username or password is incorrect!"});
         }
 
-        const userObj = getUserFromDB(username, password);
+        const userObj = getUserFromDB(username);
 
         if (userObj != null)
         {
@@ -69,9 +69,8 @@ class LoginPane extends React.Component
             </Row>
         );
 
-        console.log(submitButtonEnabled);
         return (
-            <Container className="mt-5">
+            <Container  className={'card card-body mt-5'}>
                 <Row>
                     <Col>
                         <Form onSubmit={this.handleSubmit}>
@@ -97,7 +96,6 @@ class LoginPane extends React.Component
     onRegisterClicked = () =>
     {
         setCurrentView(this.context, "register")
-        console.log("SET REGISTER")
     }
 }
 

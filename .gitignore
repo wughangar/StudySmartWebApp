@@ -3,4 +3,4 @@
 *pycache*
 frontend_code/node_modules/
 package-lock.json
-
+.mongodb_data

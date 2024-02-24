@@ -2,17 +2,18 @@ import React from 'react';
 import {Button, Col, Container, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
 import {isLoggedIn, setCurrentUser} from "../common/context_interface";
-import {getUserFromDB} from "../common/db_interface";
+import {getTestUserFromDB, getUserFromDB} from "../common/backend_interface";
 
 class DevView extends React.Component
 {
     static contextType = AppContext;
-    
-    SHOW = false;
+
+    SHOW = true;
     
     devLoginBtnClicked = () =>
     {
-        setCurrentUser(this.context, getUserFromDB(null, null));
+        const testUser = getTestUserFromDB()
+        setCurrentUser(this.context, testUser);
     };
 
     devLogoutBtnClicked = () =>
@@ -24,12 +25,13 @@ class DevView extends React.Component
     {
         if(!this.SHOW)
         {
-             return null;   
+            return null;
         }
-        
+
         return (
+            <>
             <Container fluid className="card card-body mt-5" style={{
-                backgroundColor: "#220000", border: "3px solid red",
+                backgroundColor: "#110000", border: "1px solid #ff0000",
             }}>
                 <Row>
                 </Row>
@@ -48,6 +50,7 @@ class DevView extends React.Component
                     </Col>
                 </Row>
             </Container>
+            </>
         );
     }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
 import TopicView from "./TopicView";
-import {doesUserHaveTopics} from "../common/db_interface";
+import {doesUserHaveTopics} from "../common/backend_interface";
 
 class ContentArea extends React.Component {
     static contextType = AppContext;

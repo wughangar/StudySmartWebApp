@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
-import {registerUser} from "../common/db_interface";
+import {registerUser} from "../common/backend_interface";
 import {setCurrentUser, setCurrentView} from "../common/context_interface";
 
 class RegisterNewUserPane extends React.Component
@@ -75,7 +75,7 @@ class RegisterNewUserPane extends React.Component
         );
 
         return (
-            <Container>
+            <Container className={'card card-body'}>
                 <Row>
                     <Col>
                         <Form onSubmit={this.registerUser}>

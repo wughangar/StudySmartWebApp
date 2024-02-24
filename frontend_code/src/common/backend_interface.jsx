@@ -1,3 +1,5 @@
+import {setCurrentUser} from "./context_interface";
+
 export const getUserFromDB = (username = null, userid = null) =>
 {
     // TODO: Implement this
@@ -5,17 +7,50 @@ export const getUserFromDB = (username = null, userid = null) =>
 
     if(username == null && userid == null)
     {
-        // return null;
+        return null;
     }
 
-    return getTestUserFromDB();
+    return null;
 };
 
-export const loginUser = (username, password) =>
+export const loginUser = (context, username, password) =>
 {
-    // TODO: Implement this
+    const url  = 'http://127.0.0.1:5000/login';
+    const data = {
+        username: username,
+        password: password,
+    };
 
-    return true;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(response =>
+              {
+                  console.log(response);
+                  if(response.status === 200)
+                  {
+                      response.json().then((data) =>
+                                           {
+                                               console.log("SUCCESS!", data);
+                                               setCurrentUser(context, data.user);
+                                               return data;
+                                           });
+                  }
+                  else
+                  {
+                      console.log(response.message); // log out error message
+                      return false;
+                  }
+              })
+        .catch((error) =>
+               {
+                   console.error('Error:', error);
+                   return false;
+               });
 };
 
 export const getTopicsForUser = (userid) =>
@@ -40,12 +75,11 @@ export const doesUserHaveTopics = (userid) =>
 
 export const registerUser = (username, password, email, name) =>
 {
-    const url  = '/signup';
+    const url  = 'http://127.0.0.1:5000/signup';
     const data = {
         username: username,
         password: password,
         email: email,
-        name: name,
     };
 
     return fetch(url, {
@@ -60,10 +94,13 @@ export const registerUser = (username, password, email, name) =>
         .catch((error) =>
                {
                    console.error('Error:', error);
-                   
                });
 };
 
+export const askAI = (query) => {
+    const randomString = Math.random().toString(36).substring(7);
+    return {"answer": "This is an example answer from the AI " + randomString};
+};
 /*********************************************************************/
 /** These functions only exist for development. **********************/
 /*********************************************************************/

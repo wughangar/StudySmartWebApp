@@ -2,7 +2,6 @@ import requests
 from flask_mail import Mail, Message
 from apscheduler.schedulers.background import BackgroundScheduler
 from backend_code.db import mydb
-#from backend_code.app import app
 from flask import Blueprint 
 
 facts_bp = Blueprint('facts', __name__)
