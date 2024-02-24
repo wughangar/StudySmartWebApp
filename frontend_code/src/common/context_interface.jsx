@@ -7,8 +7,8 @@ export const setCurrentUser = (context, userObj) =>
             type: "SET_USER",
             payload: userObj,
         });
-    
-    setCurrentView(context, "default")
+
+    setCurrentView(context, "default");
 };
 
 export const getCurrentUser = (context) =>
@@ -43,8 +43,19 @@ export const setCurrentView = (context, viewName) =>
 
 };
 
+export const popLastState = (context) =>
+{
+    context.dispatch(
+        {
+            type: "POP_STATE",
+            payload: null,
+        });
+
+};
+
+
 export const logout = (context) =>
 {
-    setCurrentUser(context, null)
-    setCurrentView(context, "login")
-}
+    setCurrentUser(context, null);
+    setCurrentView(context, "login");
+};

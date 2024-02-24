@@ -1,9 +1,13 @@
 import React from 'react';
 import {Button, Col, Container, FormControl, Row} from 'react-bootstrap';
 import {askAI} from "../common/backend_interface";
+import {popLastState} from "../common/context_interface";
+import {AppContext} from "./StoreProvider";
 
 class CreateNewTopicPane extends React.Component
 {
+    static contextType = AppContext;
+    
     constructor(props)
     {
         super(props);
@@ -82,12 +86,12 @@ class CreateNewTopicPane extends React.Component
 
         const bestSummaryRow = bestSummary === null ? null : (
             <>
-                <Row>
+                <Row className="mb-1">
                     <Col className={'text-primary'}>
-                        Summary
+                        Best Summary
                     </Col>
                 </Row>
-                <Row>
+                <Row className="mb-3">
                     <Col>
                         <FormControl
                             as="textarea"
@@ -96,6 +100,7 @@ class CreateNewTopicPane extends React.Component
                             placeholder={`bestSummary`}
                             value={bestSummary}
                         />
+                        <hr className="bg-primary" style={{height: '4px'}}/>
                     </Col>
                 </Row>
             </>
@@ -105,28 +110,33 @@ class CreateNewTopicPane extends React.Component
             <Container className={'card card-body'}>
                 <Row>
                     <Col className={'text-primary'}>
-                        Topic
+                        What would you like to learn about?
                     </Col>
                 </Row>
-                <Row className="mb-3">
+                <Row className="mb-1">
                     <Col>
                         <FormControl
                             type="text"
-                            placeholder="Enter topic title"
+                            placeholder="Enter topic..."
                             value={this.state.topicTitle}
                             onChange={this.handleInputChange}
                         />
+                        <hr className="bg-primary" style={{height: '4px'}}/>
                     </Col>
-
+                    
                 </Row>
-
                 {bestSummaryRow}
+
                 <Row>
                     <Col className={'text-primary'}>
                         Summary Candidates<br/>
-                        <p className={'text-body'}>(please select the topic summary that matches your goals the
-                            most)</p>
+                        <p className={'text-body'}>Please select the topic summary that matches your goals the most.
+                            This will help guide the AI assistance.
+                            <br/>
+                            Click Generate New Summary to generate a summary candidate based on the topic.
+                        </p>
                     </Col>
+
                 </Row>
                 {
                     textBoxes.map((textBox, index) => (
@@ -138,7 +148,7 @@ class CreateNewTopicPane extends React.Component
                                     placeholder={`TextBox ${index + 1}`}
                                     value={textBox}
                                 />
-                                <Button variant={'primary'}
+                                <Button className={'mx-1'} variant={'primary'}
                                         onClick={() => this.handleClickSelectCandidateBtn(textBox)}>Select</Button>
                                 <Button variant={'primary'}
                                         onClick={() => this.handleClickRemoveCandidateBtn(textBox)}>Remove</Button>
@@ -151,10 +161,18 @@ class CreateNewTopicPane extends React.Component
                         <Button variant="primary"
                                 disabled={generateNewSummaryBtnDisabled}
                                 onClick={this.handleUpdate}>Generate New Summary</Button>
-                        &nbsp;&nbsp;
+                    </Col>
+                </Row>
+                <Row className="mt-1">
+                    
+                    <Col>
+                        <hr className="bg-primary" style={{height: '4px'}}/>
+                        <Button variant="primary"
+                                onClick={this.handleCancel}>Cancel</Button>
                         <Button variant="primary"
                                 disabled={saveBtnDisabled}
                                 onClick={this.handleSave}>Save</Button>
+
                     </Col>
                 </Row>
                 {errorRow}
@@ -168,6 +186,11 @@ class CreateNewTopicPane extends React.Component
             textBoxes: prevState.textBoxes.filter(tb => tb !== textBox),
         }));
     };
+
+    handleCancel = () =>
+    {
+        popLastState(this.context)
+    }
 }
 
 export default CreateNewTopicPane;

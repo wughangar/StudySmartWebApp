@@ -42,7 +42,8 @@ class MainView extends Component
         
         let contentArea = null;
         let sidebarArea = null;
-
+    
+        console.log(`MAIN VIEW: ${currentView}`)
         if(user != null && currentView === "default")
         {
             contentArea = <ContentArea/>;

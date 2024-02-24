@@ -26,6 +26,20 @@ function reducer(state, action)
                 ...state,
                 currentView: action.payload,
             };
+        case "POP_STATE":
+            console.log("Popping state...");
+            // Retrieve the previous state stack and parse it
+            const stateStack = JSON.parse(window.localStorage.getItem('previous_state'));
+
+            // Pop the latest state from the stack
+            if(stateStack)
+            {
+                const previousState = JSON.parse(stateStack.pop());
+                window.localStorage.setItem('previous_state', JSON.stringify(stateStack)); // Update localStorage with the rest of the state stack
+                return previousState;
+            }
+
+            return state;
 
         default:
             return state;
@@ -34,23 +48,55 @@ function reducer(state, action)
 
 export const AppContext = createContext(initialState);
 
-export class StoreProvider extends React.Component {
-    constructor(props) {
+export class StoreProvider extends React.Component
+{
+    constructor(props)
+    {
         super(props);
 
         // Load the stored state, or fall back to the initial state if there is none
-        const storedState = JSON.parse(window.localStorage.getItem('myContext')) || initialState;
-
-        this.state = storedState;
-        this.dispatch = action => this.setState(state => reducer(state, action));
+        const storedState = JSON.parse(window.localStorage.getItem('current_state')) || initialState;
+        this.state        = storedState;
+        this.dispatch     = action => this.setState(state => reducer(state, action));
     }
 
-    componentDidUpdate() {
-        // Whenever state updates, store it in the local storage
-        window.localStorage.setItem('myContext', JSON.stringify(this.state));
-    };
+    componentDidUpdate(prevProps, prevState)
+    {
+        // Only push to stack when state.currentView has changed
+        if(prevState.currentView !== this.state.currentView ||
+           prevState.focusedTopic !== this.state.focusedTopic)
+        {
+            // Store the old state in previous_state stack
+            let previousStateStack = JSON.parse(window.localStorage.getItem('previous_state')) || [];
+            previousStateStack.push(JSON.stringify(prevState));
 
-    render() {
+            // Limit the size to 10
+            if(previousStateStack.length > 10)
+            {
+                previousStateStack.shift(); // Remove the oldest state
+            }
+
+            window.localStorage.setItem('previous_state', JSON.stringify(previousStateStack));
+        }
+
+        // Store the current state
+        const currentState = JSON.stringify(this.state);
+        window.localStorage.setItem('current_state', currentState || initialState);
+    }
+
+
+    componentDidMount()
+    {
+        //window.addEventListener('popstate', this.handleBackButton);
+    }
+
+    componentWillUnmount()
+    {
+        //window.removeEventListener('popstate', this.handleBackButton);
+    }
+
+    render()
+    {
         return (
             <AppContext.Provider value={
                 {

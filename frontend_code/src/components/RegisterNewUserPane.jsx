@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {AppContext} from "./StoreProvider";
 import {registerUser} from "../common/backend_interface";
-import {setCurrentUser, setCurrentView} from "../common/context_interface";
+import {popLastState, setCurrentUser, setCurrentView} from "../common/context_interface";
 
 class RegisterNewUserPane extends React.Component
 {
@@ -109,6 +109,9 @@ class RegisterNewUserPane extends React.Component
                                               onChange={this.handleChange}/>
                             </Form.Group>
 
+                            <Button variant="primary" onClick={this.onCancelClicked}>
+                                Cancel
+                            </Button>
                             <Button variant="primary" type="submit" disabled={!submitEnabled}>
                                 Register
                             </Button>
@@ -122,6 +125,11 @@ class RegisterNewUserPane extends React.Component
                 </Row>
             </Container>
         );
+    }
+
+    onCancelClicked = () =>
+    {
+        popLastState(this.context)
     }
 }
 
