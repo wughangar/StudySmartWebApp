@@ -4,6 +4,10 @@ const initialState = {
     user: null,
     topic: null,
     currentView: "login",
+    progress: {
+        progress: 0.5,
+        stepName: "Processing...",
+    },
 };
 
 function reducer(state, action)
@@ -40,6 +44,11 @@ function reducer(state, action)
             }
 
             return state;
+        case "SET_PROGRESS":
+            return {
+                ...state,
+                progress: action.payload,
+            };
 
         default:
             return state;
@@ -55,12 +64,11 @@ export class StoreProvider extends React.Component
         super(props);
 
         // Load the stored state, or fall back to the initial state if there is none
-        const storedState = JSON.parse(window.localStorage.getItem('current_state')) || initialState;
-        this.state        = storedState;
-        this.dispatch     = action => this.setState(state => reducer(state, action));
+        this.state    = JSON.parse(window.localStorage.getItem('current_state')) || initialState;
+        this.dispatch = action => this.setState(state => reducer(state, action));
     }
 
-    componentDidUpdate(prevProps, prevState)
+    componentDidUpdate(prevProps, prevState, snapShot)
     {
         // Only push to stack when state.currentView has changed
         if(prevState.currentView !== this.state.currentView ||

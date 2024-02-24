@@ -9,6 +9,7 @@ import DevView from "./DevView";
 import RegisterNewUserPane from "./RegisterNewUserPane";
 import CreateNewTopicPane from "./CreateNewTopicPane";
 import SiteFooter from "./SiteFooter";
+import ProgressDialog from "./ProgressDialog";
 
 
 class MainView extends Component
@@ -35,10 +36,18 @@ class MainView extends Component
             this.setState({localState: this.context});
         }
     }
+    
+    onProgressCancelClicked = () =>
+    {
+        this.context.dispatch({
+                                  type: "SET_PROGRESS",
+                                  payload: null,
+                              });
+    }
 
     render()
     {
-        const {currentView, user} = this.context.state;
+        const {currentView, user, progress} = this.context.state;
 
         let contentArea = null;
         let sidebarArea = null;
@@ -66,9 +75,22 @@ class MainView extends Component
             contentArea = <LoginPane/>;
         }
 
+        console.log(progress);
+        const showProgress = progress != null;
+
+        const progressElement = !showProgress ?
+                                (
+                                    <ProgressDialog show={false}/>
+                                ) : (
+                                    <ProgressDialog show={showProgress} 
+                                                    progress={progress.percent}
+                                                    stepName={progress.stepName}
+                                                    onCancel={this.onProgressCancelClicked} />
+                                );
         return (
 
             <Container fluid>
+                {progressElement}
                 <Row className="mb-1">
                     <Col>
                         <SiteHeader/>
