@@ -29,7 +29,7 @@ class AIProcessor:
             model="gpt-3.5-turbo",
             messages=messages
         )
-        return response.choices[0].message.content  # here
+        return response.choices[0].message.content
 
     def generate_quiz_questions(self, topic):
         messages = [{"role": "system", "content": "You are a helpful assistant."},
