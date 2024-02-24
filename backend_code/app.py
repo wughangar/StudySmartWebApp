@@ -2,16 +2,14 @@ import os
 
 import bcrypt
 from flask import Flask, jsonify, request, session, render_template, send_from_directory
+from flask_mail import Mail
 
-from flask_mail import Mail 
-
-from backend_code.routes.facts import facts_bp
-
+from backend_code.db import mydb
 from backend_code.routes.goals import goals_bp
 from backend_code.routes.summary import summary_bp
-from backend_code.db import mydb
-from backend_code.routes.tweet import daily_tweet_bp
 from backend_code.routes.topics import topics_bp
+from backend_code.routes.tweet import daily_tweet_bp
+from backend_code.routes.users import users_bp
 
 # Set the frontend paths relative to this script's directory
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend_code')
@@ -41,6 +39,7 @@ app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
 app.register_blueprint(topics_bp)
+app.register_blueprint(users_bp)
 
 # @app.before_request
 # def before_request():
@@ -71,7 +70,7 @@ def signup():
     username = user_data.get("username")
     password = user_data.get("password")
     email = user_data.get("email")
-    
+
     if len(username) <= MIN_USERNAME_LENGTH:
         return jsonify({'message': f'Username should be more than {MIN_USERNAME_LENGTH} characters.'}), 400
 
@@ -85,15 +84,24 @@ def signup():
     if existing_user:
         return jsonify({"message": "Username already exists"}), 400
 
-    # verification_token = generate_verification_token()
-
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    new_user = {"username": username,
-                "password": hashed_password.decode('utf-8'),
-                "email": email}
-    users_collection.insert_one(new_user)
-    return jsonify({"message": "Signup successfull"}), 201
+    new_user = {
+        "username": username,
+        "password": hashed_password.decode('utf-8'),
+        "email": email
+    }
+    # Insert the user and return the new user id
+    result = users_collection.insert_one(new_user)
+    new_user_id = result.inserted_id
+
+    return jsonify({
+        "message": "Signup successful",
+        "user": {
+            "_id": str(new_user_id),
+            "username": username
+        }
+    }), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -108,11 +116,18 @@ def login():
 
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
             session["username"] = username
-            return jsonify({"message": "login successful"}), 200
+            return jsonify({
+                "message": "login successful",
+                "user": {
+                    "_id": str(user["_id"]),
+                    "username": username
+                }
+            }), 200
         else:
             return jsonify({"message": "invalid credentials"}), 401
     else:
         return jsonify({"message": "invalid credentials"}), 401
+
 
 
 @app.route('/logout', methods=['POST'])
@@ -129,6 +144,7 @@ def custom_static(filename):
 @app.route('/js/<path:filename>')
 def custom_js(filename):
     return send_from_directory(js_dir, filename)
+
 
 
 if __name__ == '__main__':

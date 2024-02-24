@@ -33,7 +33,7 @@ def send_reminder_email():
                 if email:
                     msg = Message('Daily Study Quote', recipients=[email])
                     msg.body = f'Your daily study quote: "{quote}"'
-                    mail.send(msg)
+                    Mail.send(msg)
         else:
             print("Failed to fetch quote, reminder email not sent")
 
