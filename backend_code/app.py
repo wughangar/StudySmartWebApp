@@ -26,7 +26,7 @@ MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 20
 MIN_PASSWORD_LENGTH = 6
 
-# set email configurations
+#set email configurations
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -34,12 +34,14 @@ app.config['MAIL_USERNAME'] = 'gurulifestyle13@gmail.com'
 app.config['MAIL_PASSWORD'] = 'pkxw ycgn tsbq xacn'
 mail = Mail(app)
 
+
 # Register blueprints
 app.register_blueprint(goals_bp)
 app.register_blueprint(summary_bp)
 app.register_blueprint(daily_tweet_bp)
 app.register_blueprint(topics_bp)
 app.register_blueprint(users_bp)
+
 # @app.before_request
 # def before_request():
 #    if 'username' not in session and request.endpoint not in ['hello', 'signup', 'logout', 'login', 'goals']:
@@ -53,17 +55,24 @@ def hello():
     return render_template("index.html")
 
 
+@app.route('/signup', methods=['GET'])
+def signup_form():
+    return render_template("signup.html")
+
+
+@app.route('/learn', methods=['POST'])
+def learn():
+    return render_template("chat.py")
+
+
 @app.route('/signup', methods=['POST'])
 def signup():
     user_data = request.get_json()
     username = user_data.get("username")
     password = user_data.get("password")
     email = user_data.get("email")
-
-    print("HERE1")
-
+    
     if len(username) <= MIN_USERNAME_LENGTH:
-        print("HERE2")
         return jsonify({'message': f'Username should be more than {MIN_USERNAME_LENGTH} characters.'}), 400
 
     if len(password) <= MIN_PASSWORD_LENGTH:
@@ -73,23 +82,27 @@ def signup():
         return jsonify({"message": "Invalid email address."}), 400
 
     existing_user = users_collection.find_one({"username": username})
-
     if existing_user:
-        print("HERE4")
         return jsonify({"message": "Username already exists"}), 400
 
-    print("HERE5")
-
-    # verification_token = generate_verification_token()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    new_user = {"username": username,
-                "password": hashed_password.decode('utf-8'),
-                "email": email}
+    new_user = {
+        "username": username,
+        "password": hashed_password.decode('utf-8'),
+        "email": email
+    }
+    # Insert the user and return the new user id
+    result = users_collection.insert_one(new_user)
+    new_user_id = result.inserted_id
 
-    users_collection.insert_one(new_user)
-
-    return jsonify({"message": "Signup successfull"}), 201
+    return jsonify({
+        "message": "Signup successful",
+        "user": {
+            "_id": str(new_user_id),
+            "username": username
+        }
+    }), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -99,7 +112,6 @@ def login():
     password = user_data.get("password")
 
     user = users_collection.find_one({'username': username})
-    
     if user:
         hashed_password = user["password"]
 
