@@ -5,7 +5,7 @@ import {generateQuizForTopic, generateStudyGuideChapter, generateStudyGuideForTo
 import {setLoadingDialogStatus} from "../common/context_interface";
 import ReactMarkdown from 'react-markdown';
 
-const QuizQuestion = ({quiz}) =>
+const QuizQuestion = ({question_index, quiz}) =>
 {
     const {answer_choices, hints, question} = quiz;
 
@@ -15,24 +15,24 @@ const QuizQuestion = ({quiz}) =>
                 <h5 className="card-title">{question}</h5>
                 {answer_choices.map((choice, index) => (
                     <div key={index} className="form-check">
-                        <input className="form-check-input" type="radio" name="quizChoice" id={`choice${index}`}
+                        <input className="form-check-input" type="radio" name="quizChoice" id={`choice-${question_index}-${index}`}
                                value={choice}/>
-                        <label className="form-check-label" htmlFor={`choice${index}`}>
+                        <label className="form-check-label" htmlFor={`choice-${question_index}-${index}`}>
                             {choice}
                         </label>
                     </div>
                 ))}
 
-                <button className="btn btn-primary mt-3" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseHint"
-                        aria-expanded="false" aria-controls="collapseHint">
-                    Show Hint
-                </button>
-                <div className="collapse mt-3" id="collapseHint">
-                    <div className="card card-body">
-                        {hints.join(' ')}
-                    </div>
-                </div>
+                {/*<button className="btn btn-primary mt-3" type="button" data-bs-toggle="collapse"*/}
+                {/*        data-bs-target="#collapseHint"*/}
+                {/*        aria-expanded="false" aria-controls="collapseHint">*/}
+                {/*    Show Hint*/}
+                {/*</button>*/}
+                {/*<div className="collapse mt-3" id="collapseHint">*/}
+                {/*    <div className="card card-body">*/}
+                {/*        {hints.join('<br/>')}*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
         </div>
     );
@@ -215,7 +215,7 @@ class TopicView extends React.Component
             (qa, index) =>
             {
                 return (
-                    <QuizQuestion quiz={qa}/>);
+                    <QuizQuestion question_index={index} quiz={qa}/>);
             });
 
         const btnText = quizQuestions.length > 0 ? "Generate More!" : "Generate a Quiz!";
