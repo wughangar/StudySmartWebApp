@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 
 from backend_code.ai.ai_processor import ai_processor
 from backend_code.common.common import fix_mongodb_record_for_jsonify
-from backend_code.db import topics_collection, store_study_guide, store_quiz_questions
+from backend_code.db import topics_collection, store_study_guide, store_quiz_questions, store_study_guide_chapter_body
 
 topics_bp = Blueprint('topics_bp', __name__)
 
@@ -15,7 +15,7 @@ def insert_topic():
     topic['study_guide'] = None
     topic['quiz_questions'] = []
     topic['qa_questions'] = []
-    
+
     try:
         result = topics_collection.insert_one(topic)
     except Exception as e:
@@ -56,7 +56,7 @@ def generate_study_guide():
         topic_data = topics_collection.find_one({'_id': ObjectId(topic_id)})
         study_guide_data = ai_processor.generate_study_guide(topic_data)
         store_study_guide(study_guide_data, topic_id)
-        
+
         topic_data = topics_collection.find_one({'_id': ObjectId(topic_id)})
         return jsonify({'topic': fix_mongodb_record_for_jsonify(topic_data)})
     except Exception as e:
@@ -74,7 +74,7 @@ def generate_quiz_questions():
     try:
         topic = topics_collection.find_one({'_id': ObjectId(topic_id)})
         quiz_questions = ai_processor.generate_quiz_questions(topic)
-        
+
         store_quiz_questions(quiz_questions, topic_id)
 
         topic_data = topics_collection.find_one({'_id': ObjectId(topic_id)})
@@ -82,20 +82,25 @@ def generate_quiz_questions():
     except Exception as e:
         print("Unable to find topic: ", topic_id)
         print("Exception: ", e)
-        raise
         return jsonify({'error': 'topic not found'}), 404
 
-# @topics_bp.route('/<topic>', methods=['GET'])
-# def start_lesson(topic):
-#     ai_response = ai_processor.initiate_conversation(topic)
-#     return jsonify({"message": ai_response})
 
-# 
+@topics_bp.route('/topics/generate_study_guide_chapter', methods=['POST'])
+def generate_quiz_question_chapter():
+    data = request.get_json()
+    topic_id = data['topic_id']
+    chapter_index = data['chapter_index']
 
+    try:
+        topic = topics_collection.find_one({'_id': ObjectId(topic_id)})
 
-# 
-# 
-# @topics_bp.route('/topics/<topic>/explanation', methods=['GET'])
-# def explain_topic(topic):
-#     explanation = ai_processor.explain_topic(topic)
-#     return jsonify({"explanation": explanation})
+        body = ai_processor.generate_study_guide_chapter(topic, chapter_index-1)
+
+        store_study_guide_chapter_body(topic_id, chapter_index, body)
+        
+        topic = topics_collection.find_one({'_id': ObjectId(topic_id)})
+        return jsonify({'topic': fix_mongodb_record_for_jsonify(topic)})
+    except Exception as e:
+        print("Unable to find topic: ", topic_id)
+        print("Exception: ", e)
+        return jsonify({'error': 'topic not found'}), 404

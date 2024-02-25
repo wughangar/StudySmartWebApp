@@ -4,7 +4,6 @@ import {
     setCurrentTopic,
     setCurrentUser,
     setCurrentView,
-    setTopicQuiz,
     setTopicsList,
 } from "./context_interface";
 import {POST} from "./fetch";
@@ -180,7 +179,7 @@ export const generateSummaryForTopic = (dispatch, topicTitle) =>
 
 export const generateQuizForTopic = (dispatch, topic_id) =>
 {
-    console.log("generateQuizForTopic: topic_id: ", topic_id)
+    console.log("generateQuizForTopic: topic_id: ", topic_id);
     const url = '/topics/generate_quiz';
 
     POST(url, {'topic_id': topic_id})
@@ -188,24 +187,25 @@ export const generateQuizForTopic = (dispatch, topic_id) =>
               {
                   if(response.status === 200)
                   {
-                      response.json().then((jsonData) =>
-                                           {
-                                               console.log("generateQuizForTopic: jsonData: ", jsonData)
+                      response.json().then(
+                          (jsonData) =>
+                          {
+                              console.log("generateQuizForTopic: jsonData: ", jsonData);
 
-                                               if('error' in jsonData)
-                                               {
-                                                   dispatch({
-                                                                type: 'POPUP_ERROR',
-                                                                payload: jsonData['error'],
-                                                            });
-                                               }
-                                               else
-                                               {
-                                                   setCurrentTopic(dispatch, jsonData['topic']);
-                                               }
-
-                                               closeLoadingDialog(dispatch);
+                              if('error' in jsonData)
+                              {
+                                  dispatch({
+                                               type: 'POPUP_ERROR',
+                                               payload: jsonData['error'],
                                            });
+                              }
+                              else
+                              {
+                                  setCurrentTopic(dispatch, jsonData['topic']);
+                              }
+
+                              closeLoadingDialog(dispatch);
+                          });
                   }
               });
 };
@@ -240,6 +240,39 @@ export const generateStudyGuideForTopic = (dispatch, topic_id) =>
               });
 };
 
+export const generateStudyGuideChapter = (dispatch, topic_id, chapter_index) =>
+{
+    const url = '/topics/generate_study_guide_chapter';
+
+    POST(url, {
+        'topic_id': topic_id,
+        'chapter_index': chapter_index,
+    })
+        .then((response) =>
+              {
+                  if(response.status === 200)
+                  {
+                      response.json().then(
+                          (jsonData) =>
+                          {
+
+                              if('error' in jsonData)
+                              {
+                                  dispatch({
+                                               type: 'POPUP_ERROR',
+                                               payload: jsonData['error'],
+                                           });
+                              }
+                              else
+                              {
+                                  setCurrentTopic(dispatch, jsonData['topic']);
+                              }
+
+                              closeLoadingDialog(dispatch);
+                          });
+                  }
+              });
+};
 
 /*********************************************************************/
 /** These functions only exist for development. **********************/

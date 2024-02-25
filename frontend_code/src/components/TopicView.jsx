@@ -1,8 +1,9 @@
 import React from 'react';
 import {Button, Col, Container, Form, Nav, Row} from 'react-bootstrap';
 import {connect} from "react-redux";
-import {generateQuizForTopic, generateStudyGuideForTopic} from "../common/backend_interface";
+import {generateQuizForTopic, generateStudyGuideChapter, generateStudyGuideForTopic} from "../common/backend_interface";
 import {setLoadingDialogStatus} from "../common/context_interface";
+import ReactMarkdown from 'react-markdown';
 
 const QuizQuestion = ({quiz}) =>
 {
@@ -38,25 +39,44 @@ const QuizQuestion = ({quiz}) =>
 };
 
 // Chapter Component
-const Chapter = (chapter) =>
+const Chapter = (dispatch, topic_id, chapter) =>
 {
-
-    console.log("THE CHAPTER: ", chapter);
-    return (
-        <li className="list-group-item  bg-primary">
-            <a href="#" className="h6 text-decoration-none link-primary">{chapter.chapter_index}. {chapter.title}</a>
-            <p className="mb-0 text-secondary">{chapter.extra_description}</p>
-        </li>
-    );
+    const onGenerateClicked = () => {
+        setLoadingDialogStatus(dispatch, `Generating chapter ${chapter.chapter_index}...`);
+        generateStudyGuideChapter(dispatch, topic_id, chapter.chapter_index)
+    }
+    
+    if(chapter.body)
+    {
+        return (
+            <li className='list-group-item bg-secondary'>
+                <a href="#" className="h6 text-decoration-none link-primary">{chapter.chapter_index}. {chapter.title}</a>
+                <p className="mb-0 text-secondary">{chapter.extra_description}</p>
+                <p className="mb-0 text-primary"><ReactMarkdown>{chapter.body}</ReactMarkdown></p>
+            </li>
+        );
+    }
+    else
+    {
+        return (
+            <li className='list-group-item bg-danger'>
+                <a href="#" className="h6 text-decoration-none link-primary">{chapter.chapter_index}. {chapter.title}</a>
+                <p className="mb-0 text-secondary">{chapter.extra_description}</p>
+                <Button className={'btn-sm'} onClick={onGenerateClicked}>Generate Chapter</Button>
+            </li>
+        );
+        
+    }
 };
 
 // Chapters List Component
-const ChaptersList = (chapters) =>
+const ChaptersList = (dispatch, topic) =>
 {
-    console.log("CHAPTERS: ", chapters);
+    const chapters = topic.study_guide.chapters
+    
     return (
         <ul className="list-group">
-            {chapters.map(chapter => Chapter(chapter))}
+            {chapters.map(chapter => Chapter(dispatch, topic._id, chapter))}
         </ul>
     );
 };
@@ -178,7 +198,7 @@ class TopicView extends React.Component
         return (
             <Row>
                 <Col>
-                    {ChaptersList(studyGuide.chapters)}
+                    {ChaptersList(this.props.dispatch, currentTopic)}
                 </Col>
             </Row>
         );

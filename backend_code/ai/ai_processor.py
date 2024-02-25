@@ -53,11 +53,33 @@ class AIProcessor:
 
         study_guide_data = search_for_json_markdown(response)
 
+        for chapter in study_guide_data['chapters']:
+            chapter['body'] = None
+
+        print_json(fix_mongodb_record_for_jsonify(study_guide_data))
+
         return study_guide_data
+
+    def generate_study_guide_chapter(self, topic, chapter_index):
+        chapter_title = topic['study_guide']['chapters'][chapter_index]
+
+        instructions = f"""Generate a study guide chapter text for the topic: {topic['title']}.  
+            The chapter title is: {chapter_title}.
+            Generate as many paragraphs as necessary to teach the chapter of this topic.  Only generate text for the 
+            chapter and not for the whole topic.
+        """
+
+        messages = [{"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": instructions
+                     }]
+
+        chapter_body = self._send_messages(messages)
+
+        return chapter_body
 
     def generate_quiz_questions(self, topic):
         print_json(fix_mongodb_record_for_jsonify(topic))
-        
+
         instructions = f"""Generate 10 multiple choice quiz questions with several hints each 
             for {topic['title']} stored in a JSON object printed in a markdown code block.  Do not respond with 
             anything but a json object in a markdown code block. It should have the format""" + """
