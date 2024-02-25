@@ -1,41 +1,29 @@
-var globalContext = null;
-
-export const setCurrentUser = (context, userObj) =>
+export const setCurrentUser = (dispatch, userObj) =>
 {
-    context.dispatch(
+    console.log("SETTING CURRENT USER: ", userObj);
+    dispatch(
         {
             type: "SET_USER",
             payload: userObj,
         });
 
-    setCurrentView(context, "default");
+    setCurrentView(dispatch, "default");
 };
 
-export const getCurrentUser = (context) =>
-{
-    const {state} = context;
-    const {user}  = state;
-    return user;
-};
 
-export const isLoggedIn = (context) =>
+export const setCurrentTopic = (dispatch, topic) =>
 {
-    return getCurrentUser(context) != null;
-};
-
-export const setCurrentTopic = (context, topic) =>
-{
-    context.dispatch(
+    console.log("SETTING THE TOPIC: ", topic)
+    dispatch(
         {
             type: "SET_TOPIC",
             payload: topic,
         });
-
 };
 
-export const setCurrentView = (context, viewName) =>
+export const setCurrentView = (dispatch, viewName) =>
 {
-    context.dispatch(
+    dispatch(
         {
             type: "SET_VIEW",
             payload: viewName,
@@ -43,18 +31,71 @@ export const setCurrentView = (context, viewName) =>
 
 };
 
-export const popLastState = (context) =>
+
+export const logout = (dispatch) =>
 {
-    context.dispatch(
+    setCurrentUser(dispatch, null);
+    setCurrentView(dispatch, "login");
+};
+
+export const setTopicsList = (dispatch, topics) =>
+{
+    dispatch(
         {
-            type: "POP_STATE",
-            payload: null,
-        });
+            type: "SET_TOPICS",
+            payload: topics,
+        },
+    );
 };
 
 
-export const logout = (context) =>
+export const insertTopicSummary = (dispatch, summary) =>
 {
-    setCurrentUser(context, null);
-    setCurrentView(context, "login");
+    dispatch(
+        {
+            type: "INSERT_TOPIC_SUMMARY",
+            payload: summary,
+        },
+    );
 };
+
+export const removeTopicSummary = (dispatch, summary) =>
+{
+    dispatch(
+        {
+            type: "REMOVE_TOPIC_SUMMARY",
+            payload: summary,
+        },
+    );
+};
+
+export const setTopicQuiz = (dispatch, quiz) =>
+{
+    dispatch(
+        {
+            type: "SET_TOPIC_QUIZ",
+            payload: quiz,
+        },
+    );
+};
+
+
+export const setLoadingDialogStatus = (dispatch, statusText) =>
+{
+    dispatch(
+        {
+            type: "SET_LOADING_DIALOG",
+            payload: statusText,
+        },
+    );
+}
+
+export const closeLoadingDialog = (dispatch) =>
+{
+    dispatch(
+        {
+            type: "SET_LOADING_DIALOG",
+            payload: null,
+        },
+    );
+}

@@ -1,76 +1,87 @@
 import React from 'react';
 import {Button, Col, Container, FormControl, Row} from 'react-bootstrap';
-import {askAI} from "../common/backend_interface";
-import {popLastState} from "../common/context_interface";
-import {AppContext} from "./StoreProvider";
+import {askAI, createNewTopic, generateSummaryForTopic} from "../common/backend_interface";
+import {
+    insertTopicSummary,
+    removeTopicSummary,
+    setCurrentView,
+    setLoadingDialogStatus,
+} from "../common/context_interface";
+import {connect} from "react-redux";
 
 class CreateNewTopicPane extends React.Component
 {
-    static contextType = AppContext;
-
     constructor(props)
     {
         super(props);
         this.state = {
             topicTitle: '',
-            textBoxes: ['test'],
             bestSummary: null,
             errorMsg: null,
         };
     }
 
-    handleInputChange = (event) =>
+    onInputChanged = (event) =>
     {
         this.setState({topicTitle: event.target.value});
-
     };
 
-    handleTextBoxChange = (index, event) =>
-    {
-        const newTextBoxes  = this.state.textBoxes.slice();
-        newTextBoxes[index] = event.target.value;
-        this.setState({textBoxes: newTextBoxes});
-    };
 
-    handleUpdate = (event) =>
+    onGenerateNewSummaryClicked = (event) =>
     {
         // Do something for updating the topic
         event.preventDefault();
         const {topicTitle} = this.state;
-
-        const answer = askAI(`Please generate a one paragraph summary of the following topic for a beginner: ${topicTitle}`);
-
-        this.addSummaryCandidate(answer.answer);
-
+        generateSummaryForTopic(this.props.dispatch, topicTitle)
+        setLoadingDialogStatus(this.props.dispatch, "Generating a summary...")
     };
 
-    handleSave = (event) =>
+    onSaveClicked = (event) =>
     {
         const {topicTitle, bestSummary} = this.state;
+        console.log(topicTitle, bestSummary);
 
+        const topic = {
+            userid: this.props.user._id,
+            title: topicTitle,
+            summary: bestSummary,
+        };
 
+        createNewTopic(this.props.dispatch, topic);
+        setCurrentView(this.props.dispatch, "default");
+    };
+
+    onRemoveCandidateClicked = (textBox) =>
+    {
+        removeTopicSummary(this.props.dispatch, textBox);
+    };
+
+    onCancelClicked = () =>
+    {
+        setCurrentView(this.props.dispatch, "default");
     };
 
     addSummaryCandidate = (answer) =>
     {
-        this.setState(prevState => ({
-            textBoxes: [...prevState.textBoxes, answer],
-        }));
+        insertTopicSummary(this.props.dispatch, answer);
     };
 
-    handleClickSelectCandidateBtn = (textBox) =>
+    onSelectCandidateClicked = (textBox) =>
     {
-        this.setState(prevState => ({
-            textBoxes: prevState.bestSummary ?
-                [...prevState.textBoxes.filter(tb => tb !== textBox), prevState.bestSummary] :
-                       prevState.textBoxes.filter(tb => tb !== textBox),
-            bestSummary: textBox,
-        }));
+        if(this.state.bestSummary)
+        {
+            // Remove the old best summary
+            insertTopicSummary(this.props.dispatch, this.state.bestSummary);
+        }
+        
+        removeTopicSummary(this.props.dispatch, textBox)
+        this.setState({bestSummary: textBox});
     };
 
     render()
     {
-        const {errorMsg, topicTitle, bestSummary, textBoxes} = this.state;
+        const {errorMsg, topicTitle, bestSummary} = this.state;
+        const {topicSummaries}                    = this.props;
 
         const errorRow = errorMsg === null ? null : (
             <Row>
@@ -80,10 +91,31 @@ class CreateNewTopicPane extends React.Component
             </Row>
         );
 
-
         const generateNewSummaryBtnDisabled = topicTitle.length === 0;
         const saveBtnDisabled               = generateNewSummaryBtnDisabled || bestSummary === null;
 
+
+        let topicRows = null;
+
+        if(topicSummaries)
+        {
+            topicRows = topicSummaries.map((textBox, index) => (
+                <Row key={`textBox-${index}`} className="mb-3">
+                    <Col className={'d-flex justify-content-between align-items-center'}>
+                        <FormControl
+                            as="textarea"
+                            readOnly
+                            placeholder={`TextBox ${index + 1}`}
+                            value={textBox}
+                        />
+                        <Button className={'mx-1'} variant={'primary'}
+                                onClick={() => this.onSelectCandidateClicked(textBox)}>Select</Button>
+                        <Button variant={'primary'}
+                                onClick={() => this.onRemoveCandidateClicked(textBox)}>Remove</Button>
+                    </Col>
+                </Row>
+            ));
+        }
         const bestSummaryRow = bestSummary === null ? null : (
             <>
                 <Row className="mb-1">
@@ -119,7 +151,7 @@ class CreateNewTopicPane extends React.Component
                             type="text"
                             placeholder="Enter topic..."
                             value={this.state.topicTitle}
-                            onChange={this.handleInputChange}
+                            onChange={this.onInputChanged}
                         />
                         <hr className="bg-primary" style={{height: '4px'}}/>
                     </Col>
@@ -138,29 +170,12 @@ class CreateNewTopicPane extends React.Component
                     </Col>
 
                 </Row>
-                {
-                    textBoxes.map((textBox, index) => (
-                        <Row key={`textBox-${index}`} className="mb-3">
-                            <Col className={'d-flex justify-content-between align-items-center'}>
-                                <FormControl
-                                    as="textarea"
-                                    readOnly
-                                    placeholder={`TextBox ${index + 1}`}
-                                    value={textBox}
-                                />
-                                <Button className={'mx-1'} variant={'primary'}
-                                        onClick={() => this.handleClickSelectCandidateBtn(textBox)}>Select</Button>
-                                <Button variant={'primary'}
-                                        onClick={() => this.handleClickRemoveCandidateBtn(textBox)}>Remove</Button>
-                            </Col>
-                        </Row>
-                    ))
-                }
+                {topicRows}
                 <Row className="mb-3">
                     <Col>
                         <Button variant="primary"
                                 disabled={generateNewSummaryBtnDisabled}
-                                onClick={this.handleUpdate}>Generate New Summary</Button>
+                                onClick={this.onGenerateNewSummaryClicked}>Generate New Summary</Button>
                     </Col>
                 </Row>
                 <Row className="mt-1">
@@ -168,10 +183,10 @@ class CreateNewTopicPane extends React.Component
                     <Col>
                         <hr className="bg-primary" style={{height: '4px'}}/>
                         <Button variant="primary"
-                                onClick={this.handleCancel}>Cancel</Button>
+                                onClick={this.onCancelClicked}>Cancel</Button>
                         <Button variant="primary"
                                 disabled={saveBtnDisabled}
-                                onClick={this.handleSave}>Save</Button>
+                                onClick={this.onSaveClicked}>Save</Button>
 
                     </Col>
                 </Row>
@@ -180,17 +195,11 @@ class CreateNewTopicPane extends React.Component
         );
     }
 
-    handleClickRemoveCandidateBtn = (textBox) =>
-    {
-        this.setState(prevState => ({
-            textBoxes: prevState.textBoxes.filter(tb => tb !== textBox),
-        }));
-    };
-
-    handleCancel = () =>
-    {
-        popLastState(this.context);
-    };
 }
 
-export default CreateNewTopicPane;
+const mapStateToProps = state => ({
+    user: state.users.user,
+    topicSummaries: state.topics.topicSummaries,
+});
+
+export default connect(mapStateToProps)(CreateNewTopicPane);

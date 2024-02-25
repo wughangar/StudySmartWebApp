@@ -1,18 +1,15 @@
 import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
 import TopicsList from "./TopicsList";
 import {logout, setCurrentView} from "../common/context_interface";
+import {connect} from "react-redux";
 
 class SiteSidebar extends React.Component
 {
-    static contextType = AppContext;
-
     render()
     {
-        const {state} = this.context;
-        const {user}  = state;
-
+        const {user} = this.props;
+        
         return (
             <Container fluid className="card card-body mt-2">
                 <Row>
@@ -38,13 +35,17 @@ class SiteSidebar extends React.Component
 
     onAddNewTopicClicked = () =>
     {
-        setCurrentView(this.context, "createNewTopic");
+        setCurrentView(this.props.dispatch,  "createNewTopic");
     };
 
     onLogoutClicked = () =>
     {
-        logout(this.context);
+        logout(this.props.dispatch);
     };
 }
 
-export default SiteSidebar;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(SiteSidebar);

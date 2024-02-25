@@ -1,8 +1,9 @@
 #!/bin/bash
    
 THIS_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
-
-VENV_DIR=$THIS_SCRIPT_DIR/.venv
+PROJECT_DIR=$(dirname "$THIS_SCRIPT_DIR")
+BACKEND_DIR="$PROJECT_DIR/backend_code"
+VENV_DIR=$PROJECT_DIR/.venv
 
 if [ ! -d "$VENV_DIR" ]; then
   echo ">> Creating virtualenv..."
@@ -11,6 +12,6 @@ fi
 
 source "$VENV_DIR/bin/activate"
 
-python3 -m pip install -r "$THIS_SCRIPT_DIR/requirements.txt"
+python3 -m pip install -r "$BACKEND_DIR/requirements.txt"
 
   

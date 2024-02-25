@@ -27,7 +27,7 @@ def save_summary():
     return jsonify({"message": "Summary saved successfully"}), 200
 
 
-@summary_bp.route('/<topic>', methods=['GET'])
+@summary_bp.route('/summary/<topic>', methods=['GET'])
 def get_summary(topic):
     # Retrieve the summary for the specified topic
     summary_collection = mydb["summary"]

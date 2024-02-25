@@ -1,13 +1,13 @@
 import React from "react";
 import '../css/bootstrap.min.css';
-import {AppContext} from "./StoreProvider";
 import {getUserFromDB, loginUser} from "../common/backend_interface";
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {setCurrentUser, setCurrentView} from "../common/context_interface";
+import {connect} from "react-redux";
 
 class LoginPane extends React.Component
 {
-    static contextType = AppContext;
+
 
     constructor(props)
     {
@@ -38,7 +38,7 @@ class LoginPane extends React.Component
         // event.preventDefault();
         const {username, password} = this.state;
 
-        if (loginUser(this.context, username, password))
+        if(loginUser(this.props.dispatch, username, password))
         {
             this.setState({...this.state, errorMsg: null});
         }
@@ -49,9 +49,9 @@ class LoginPane extends React.Component
 
         const userObj = getUserFromDB(username);
 
-        if (userObj != null)
+        if(userObj != null)
         {
-            setCurrentUser(this.context, userObj);
+            setCurrentUser(this.props.dispatch, userObj);
         }
     }
 
@@ -70,7 +70,7 @@ class LoginPane extends React.Component
         );
 
         return (
-            <Container  className={'card card-body mt-5'}>
+            <Container className={'card card-body mt-5'}>
                 <Row>
                     <Col>
                         <Form onSubmit={this.handleSubmit}>
@@ -86,7 +86,7 @@ class LoginPane extends React.Component
                             &nbsp;&nbsp;&nbsp;Or <a href={"#"} onClick={this.onRegisterClicked}>Register</a>...
                         </Form>
                     </Col>
-                    
+
                 </Row>
                 {errorSection}
             </Container>
@@ -95,8 +95,12 @@ class LoginPane extends React.Component
 
     onRegisterClicked = () =>
     {
-        setCurrentView(this.context, "register")
-    }
+        setCurrentView(this.props.dispatch, "register");
+    };
 }
 
-export default LoginPane;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(LoginPane);

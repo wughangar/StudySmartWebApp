@@ -1,11 +1,9 @@
 import React from 'react';
 import {Button, Modal, ProgressBar} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
+import {connect} from "react-redux";
 
 class ProgressDialog extends React.Component
 {
-    static contextType = AppContext;
-    
     constructor(props)
     {
         super(props);
@@ -34,7 +32,7 @@ class ProgressDialog extends React.Component
 
     render()
     {
-        const {progress} = this.context.state;
+        const {progress} = this.props;
         
         if(!progress)
         {
@@ -66,4 +64,9 @@ class ProgressDialog extends React.Component
     }
 }
 
-export default ProgressDialog;
+const mapStateToProps = state => ({
+    user: state.users.user,
+    progress: state.app.progress
+});
+
+export default connect(mapStateToProps)(ProgressDialog);

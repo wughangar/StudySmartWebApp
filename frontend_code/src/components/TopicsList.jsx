@@ -1,35 +1,33 @@
 import React from "react";
 import ListGroup from 'react-bootstrap/ListGroup';
 import {getTopicsForUser} from "../common/backend_interface";
-import {AppContext} from "./StoreProvider";
 import {setCurrentTopic} from "../common/context_interface";
 import {Col, Container, Row} from "react-bootstrap";
+import {connect} from "react-redux";
 
 class TopicsList extends React.Component
 {
-    static contextType = AppContext;
-
-    constructor()
+    componentDidMount()
     {
-        super();
-        this.state = {
-            topics: ["Topic 1", "Topic 2", "Topic 3", "Topic 4"],
-        };
+        getTopicsForUser(this.props.dispatch, this.props.user._id)
     }
 
+    onTopicClicked(topic)
+    {
+        setCurrentTopic(this.props.dispatch, topic);
+    }
+    
     renderList()
     {
-        const {state}              = this.context;
-        const {user, focusedTopic} = state;
+        const {user, currentTopic, topics} = this.props;
 
-        const topics = getTopicsForUser(user.user_id);
 
         return topics.map((topic, index) =>
                           {
 
                               let bgColor = "white";
 
-                              if(focusedTopic != null && topic.topic_id === focusedTopic.topic_id)
+                              if(currentTopic != null && topic.topic_id === currentTopic.topic_id)
                               {
                                   bgColor = "lightgreen";
                               }
@@ -49,6 +47,12 @@ class TopicsList extends React.Component
 
     render()
     {
+        if(!this.props.topics)
+        {
+            return "No topics found."
+        }
+            
+        
         return (
             <Container fluid><Row>
                 <Col>
@@ -62,10 +66,12 @@ class TopicsList extends React.Component
         );
     }
 
-    onTopicClicked(topic)
-    {
-        setCurrentTopic(this.context, topic);
-    }
 }
 
-export default TopicsList;
+const mapStateToProps = state => ({
+    user: state.users.user,
+    currentTopic: state.topics.currentTopic,
+    topics: state.topics.topics
+});
+
+export default connect(mapStateToProps)(TopicsList);

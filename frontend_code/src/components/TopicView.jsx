@@ -1,11 +1,68 @@
 import React from 'react';
 import {Button, Col, Container, Form, Nav, Row} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
+import {connect} from "react-redux";
+import {generateQuizForTopic, generateStudyGuideForTopic} from "../common/backend_interface";
+import {setLoadingDialogStatus} from "../common/context_interface";
+
+const QuizQuestion = ({quiz}) =>
+{
+    const {answer_choices, hints, question} = quiz;
+
+    return (
+        <div className="card">
+            <div className="card-body">
+                <h5 className="card-title">{question}</h5>
+                {answer_choices.map((choice, index) => (
+                    <div key={index} className="form-check">
+                        <input className="form-check-input" type="radio" name="quizChoice" id={`choice${index}`}
+                               value={choice}/>
+                        <label className="form-check-label" htmlFor={`choice${index}`}>
+                            {choice}
+                        </label>
+                    </div>
+                ))}
+
+                <button className="btn btn-primary mt-3" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseHint"
+                        aria-expanded="false" aria-controls="collapseHint">
+                    Show Hint
+                </button>
+                <div className="collapse mt-3" id="collapseHint">
+                    <div className="card card-body">
+                        {hints.join(' ')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Chapter Component
+const Chapter = (chapter) =>
+{
+
+    console.log("THE CHAPTER: ", chapter);
+    return (
+        <li className="list-group-item  bg-primary">
+            <a href="#" className="h6 text-decoration-none link-primary">{chapter.chapter_index}. {chapter.title}</a>
+            <p className="mb-0 text-secondary">{chapter.extra_description}</p>
+        </li>
+    );
+};
+
+// Chapters List Component
+const ChaptersList = (chapters) =>
+{
+    console.log("CHAPTERS: ", chapters);
+    return (
+        <ul className="list-group">
+            {chapters.map(chapter => Chapter(chapter))}
+        </ul>
+    );
+};
 
 class TopicView extends React.Component
 {
-    static contextType = AppContext;
-
     componentDidMount()
     {
         if(!this.state)
@@ -33,6 +90,19 @@ class TopicView extends React.Component
                           selectedTab,
                       });
     };
+
+    onGenerateQuizClicked = () =>
+    {
+        setLoadingDialogStatus(this.props.dispatch, "Generating quiz...");
+        generateQuizForTopic(this.props.dispatch, this.props.currentTopic._id);
+    };
+
+    onGenerateStudyGuideClicked = () =>
+    {
+        setLoadingDialogStatus(this.props.dispatch, "Generating study guide...");
+        generateStudyGuideForTopic(this.props.dispatch, this.props.currentTopic._id);
+    };
+
 
     generateTabView = () =>
     {
@@ -87,10 +157,28 @@ class TopicView extends React.Component
 
     generateTab_StudyGuide = () =>
     {
+        const {currentTopic} = this.props;
+
+        console.log("The current topic: ", currentTopic);
+        const studyGuide = currentTopic.study_guide;
+
+        if(!studyGuide || !studyGuide.chapters)
+        {
+            return (
+                <Row>
+                    <Col>
+                        <Button variant="primary" onClick={this.onGenerateStudyGuideClicked}>Generate a Study
+                            Guide!</Button>
+                    </Col>
+                </Row>
+            );
+        }
+
+
         return (
             <Row>
                 <Col>
-                    Study Guide
+                    {ChaptersList(studyGuide.chapters)}
                 </Col>
             </Row>
         );
@@ -98,12 +186,32 @@ class TopicView extends React.Component
 
     generateTab_Quiz = () =>
     {
-        return (
-            <Row>
-                <Col>
-                    Quiz
-                </Col>
-            </Row>
+        const {currentTopic} = this.props;
+        const quizQuestions  = currentTopic.quiz_questions;
+
+        console.log("QUIZ QUESTIONS: ", quizQuestions);
+
+        const questionElements = quizQuestions.map(
+            (qa, index) =>
+            {
+                return (
+                    <QuizQuestion quiz={qa}/>);
+            });
+
+        const btnText = quizQuestions.length > 0 ? "Generate More!" : "Generate a Quiz!";
+        
+        return (<>
+                <Row>
+                    <Col>
+                        {questionElements}
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Button variant="primary" onClick={this.onGenerateQuizClicked}>{btnText}</Button>
+                    </Col>
+                </Row>
+            </>
         );
     };
 
@@ -121,11 +229,11 @@ class TopicView extends React.Component
     generateTab_Summary()
     {
 
-        const {focusedTopic}      = this.context.state;
+        const {currentTopic}      = this.props;
         const {question}          = this.state;
         const submitButtonEnabled = question.length > 0;
 
-        if(!focusedTopic)
+        if(!currentTopic)
         {
             return (
                 <Row>
@@ -139,7 +247,7 @@ class TopicView extends React.Component
             return (<>
                     <Row>
                         <Col>
-                            <p className="text-secondary">{focusedTopic.generated_summary}</p>
+                            <p className="text-secondary">{currentTopic.summary}</p>
                         </Col>
                     </Row>
                     <Row>
@@ -178,4 +286,11 @@ class TopicView extends React.Component
     }
 }
 
-export default TopicView;
+const mapStateToProps = state => ({
+    user: state.users.user,
+    currentTopic: state.topics.currentTopic,
+    quiz: state.topics.quiz,
+    studyGuide: state.topics.studyGuide,
+});
+
+export default connect(mapStateToProps)(TopicView);

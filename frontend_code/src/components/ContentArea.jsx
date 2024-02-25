@@ -1,27 +1,23 @@
 import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
 import TopicView from "./TopicView";
-import {doesUserHaveTopics} from "../common/backend_interface";
+import {connect} from "react-redux";
 
 class ContentArea extends React.Component
 {
-    static contextType = AppContext;
-
     render()
     {
-        const {state}        = this.context;
-        const {focusedTopic} = state;
+        const {currentTopic} = this.props;
 
         let content = null;
 
-        if(focusedTopic)
+        if(currentTopic)
         {
             content = (<TopicView/>);
         }
         else
         {
-            if(!doesUserHaveTopics())
+            if(!this.props.currentTopic)
             {
                 content = (
                     <p>Click "Add new topic..." on the sidebar.</p>
@@ -41,4 +37,9 @@ class ContentArea extends React.Component
     }
 }
 
-export default ContentArea;
+const mapStateToProps = state => ({
+    user: state.users.user,
+    currentTopic: state.topics.currentTopic,
+});
+
+export default connect(mapStateToProps)(ContentArea);

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
+import {connect} from "react-redux";
 
 const logo = process.env.PUBLIC_URL + '/logo512.png';
 
@@ -19,4 +20,8 @@ class SiteHeader extends React.Component
     }
 };
 
-export default SiteHeader;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(SiteHeader);

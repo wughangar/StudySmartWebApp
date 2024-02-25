@@ -1,26 +1,69 @@
 import React from 'react';
 import {Button, Col, Container, Row} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
-import {isLoggedIn, setCurrentUser} from "../common/context_interface";
+import {setCurrentUser, setLoadingDialogStatus} from "../common/context_interface";
 import {getTestUserFromDB} from "../common/backend_interface";
+import {connect} from "react-redux";
 
 class DevView extends React.Component
 {
-    static contextType = AppContext;
-
     SHOW = true;
 
     devLoginBtnClicked = () =>
     {
         const testUser = getTestUserFromDB();
-        setCurrentUser(this.context, testUser);
+        setCurrentUser(this.props.dispatch, testUser);
     };
 
     devLogoutBtnClicked = () =>
     {
-        setCurrentUser(this.context, null);
+        setCurrentUser(this.props.dispatch, null);
+    };
+    clearBrowserDataClicked = () =>
+    {
+        window.localStorage.setItem('myContent', JSON.stringify({}));
+        setCurrentUser(this.props.dispatch, null);
     };
 
+    testProgressClicked = async() =>
+    {
+        const max = 100;
+
+        for(let i = 0; i < max; ++i)
+        {
+
+            this.props.dispatch({
+                                    type: "SET_PROGRESS",
+                                    payload: {
+                                        progress: i / max,
+                                        stepName: "Processing...",
+                                    },
+                                });
+
+            // Wait for 5 seconds
+            await new Promise(resolve => setTimeout(resolve, 22));
+        }
+
+        // Now set progress to 1.0
+        this.props.dispatch({
+                                type: "SET_PROGRESS",
+                                payload: {
+                                    progress: 1.0,
+                                    stepName: "Complete",
+                                },
+                            });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.props.dispatch({
+                                type: "SET_PROGRESS",
+                                payload: null,
+                            });
+    };
+
+    testLoadingDialogClicked = () =>
+    {
+        setLoadingDialogStatus(this.props.dispatch, "Loading!")
+    }
+    
     render()
     {
         if(!this.SHOW)
@@ -43,14 +86,25 @@ class DevView extends React.Component
                     <Row>
                         <Col>
                             <Button className={'mx-1'}
-                                    onClick={this.devLoginBtnClicked} 
-                                    disabled={isLoggedIn(this.context)}>DEV: Login</Button>
-                            <Button onClick={this.devLogoutBtnClicked} 
-                                    disabled={!isLoggedIn(this.context)}>DEV: Logout</Button>
-                            <Button onClick={this.clearBrowserDataClicked}>
+                                    onClick={this.devLoginBtnClicked}
+                                    disabled={this.props.user !== null}>DEV: Login</Button>
+
+                            <Button className={'mx-1'}
+                                    onClick={this.devLogoutBtnClicked}
+                                    disabled={this.props.user === null}>DEV: Logout</Button>
+
+                            <Button className={'mx-1'}
+                                    onClick={this.clearBrowserDataClicked}>
                                 Clear Browser Data</Button>
-                            <Button onClick={this.testProgressClicked}>
+
+                            <Button className={'mx-1'}
+                                    onClick={this.testProgressClicked}>
                                 Test Progress Dialog</Button>
+
+                            <Button className={'mx-1'}
+                                    onClick={this.testLoadingDialogClicked}>
+                                Test Loading Dialog</Button>
+
                         </Col>
                     </Row>
                 </Container>
@@ -58,46 +112,11 @@ class DevView extends React.Component
         );
     }
 
-    clearBrowserDataClicked = () =>
-    {
-        window.localStorage.setItem('myContent', JSON.stringify({}));
-        setCurrentUser(this.context, null);
-    };
-
-    testProgressClicked = async () =>
-    {
-        const max = 100;
-        
-        for(let i=0; i< max; ++i)
-        {
-            
-            this.context.dispatch({
-                                      type: "SET_PROGRESS",
-                                      payload: {
-                                          progress: i/max,
-                                          stepName: "Processing...",
-                                      },
-                                  });
-
-            // Wait for 5 seconds
-            await new Promise(resolve => setTimeout(resolve, 22));
-        }
-
-        // Now set progress to 1.0
-        this.context.dispatch({
-                                  type: "SET_PROGRESS",
-                                  payload: {
-                                      progress: 1.0,
-                                      stepName: "Complete",
-                                  },
-                              });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        this.context.dispatch({
-                                  type: "SET_PROGRESS",
-                                  payload: null,
-                              });
-    }
+  
 }
 
-export default DevView;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(DevView);

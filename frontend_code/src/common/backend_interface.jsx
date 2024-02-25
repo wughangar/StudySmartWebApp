@@ -1,4 +1,13 @@
-import {setCurrentUser} from "./context_interface";
+import {
+    closeLoadingDialog,
+    insertTopicSummary,
+    setCurrentTopic,
+    setCurrentUser,
+    setCurrentView,
+    setTopicQuiz,
+    setTopicsList,
+} from "./context_interface";
+import {POST} from "./fetch";
 
 export const getUserFromDB = (username = null, userid = null) =>
 {
@@ -13,94 +22,225 @@ export const getUserFromDB = (username = null, userid = null) =>
     return null;
 };
 
-export const loginUser = (context, username, password) =>
+export const loginUser = (dispatch, username, password) =>
 {
-    const url  = 'http://127.0.0.1:5000/login';
+    const url = '/login';
+
     const data = {
         username: username,
         password: password,
     };
 
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
+    POST(url, data)
         .then(response =>
               {
                   console.log(response);
+
                   if(response.status === 200)
                   {
                       response.json().then((data) =>
                                            {
                                                console.log("SUCCESS!", data);
-                                               setCurrentUser(context, data.user);
-                                               return data;
+                                               setCurrentUser(dispatch, data.user);
                                            });
                   }
                   else
                   {
                       console.log(response.message); // log out error message
-                      return false;
                   }
               })
         .catch((error) =>
                {
                    console.error('Error:', error);
-                   return false;
                });
 };
 
-export const getTopicsForUser = (userid) =>
+export const registerUser = (dispatch, username, password, email, name) =>
 {
-    // TODO: Implement this
-
-    return getTestListOfTopicsForTestUser();
-};
-
-export const doesUserHaveTopics = (userid) =>
-{
-    const topics = getTopicsForUser(userid);
-
-    if(!topics)
-    {
-        return false;
-    }
-
-    return topics.length > 0;
-};
-
-
-export const registerUser = (username, password, email, name) =>
-{
-    const url  = 'http://127.0.0.1:5000/signup';
+    const url  = '/signup';
     const data = {
         username: username,
         password: password,
         email: email,
     };
 
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(data),
-    })
-        .then(response => response.json())
+    POST(url, data)
+        .then(response =>
+              {
+                  response.json().then((data) =>
+                                       {
+                                           setCurrentUser(dispatch, data.user);
+                                           setCurrentView(dispatch, "default");
+                                       });
+
+              })
         .catch((error) =>
                {
                    console.error('Error:', error);
                });
 };
 
-export const askAI = (query) => {
+export const askAI = (query) =>
+{
     const randomString = Math.random().toString(36).substring(7);
     return {"answer": "This is an example answer from the AI " + randomString};
 };
+
+export const getTopicsForUser = (dispatch, userid) =>
+{
+    const data = {
+        userid: userid,
+    };
+
+    const url = '/topics/by_user';
+
+    POST(url, data).then(response =>
+                         {
+                             if(response.status === 200)
+                             {
+                                 response.json().then(
+                                     (data) =>
+                                     {
+                                         setTopicsList(dispatch, data['topics']);
+                                     });
+                             }
+                             else
+                             {
+                                 console.log(response.message); // log out error message
+                             }
+                         })
+                   .catch((error) =>
+                          {
+                              console.error('Error:', error);
+                          });
+
+
+};
+
+export const createNewTopic = (dispatch, topic) =>
+{
+    const url = '/topics';
+
+    console.log("THE TOPIC: ", topic);
+    POST(url, topic)
+        .then((response) =>
+              {
+                  if(response.status === 200)
+                  {
+                      const jsonData = response.json();
+
+                      if('error' in jsonData)
+                      {
+                          dispatch({
+                                       type: 'POPUP_ERROR',
+                                       payload: jsonData['error'],
+                                   });
+                      }
+                      else
+                      {
+                          // Refresh the topics list
+                          setCurrentTopic(dispatch, jsonData['topic']);
+                      }
+                  }
+              });
+
+};
+
+export const generateSummaryForTopic = (dispatch, topicTitle) =>
+{
+    const url = '/topics/generate_summary';
+
+    POST(url, {'topic_title': topicTitle})
+        .then((response) =>
+              {
+                  if(response.status === 200)
+                  {
+                      response.json().then((jsonData) =>
+                                           {
+
+                                               if('error' in jsonData)
+                                               {
+                                                   dispatch({
+                                                                type: 'POPUP_ERROR',
+                                                                payload: jsonData['error'],
+                                                            });
+                                               }
+                                               else
+                                               {
+                                                   console.log("AI: ", jsonData);
+                                                   // Refresh the topics list
+                                                   insertTopicSummary(dispatch, jsonData['summary']);
+                                               }
+
+                                               closeLoadingDialog(dispatch);
+                                           });
+                  }
+              });
+};
+
+export const generateQuizForTopic = (dispatch, topic_id) =>
+{
+    console.log("generateQuizForTopic: topic_id: ", topic_id)
+    const url = '/topics/generate_quiz';
+
+    POST(url, {'topic_id': topic_id})
+        .then((response) =>
+              {
+                  if(response.status === 200)
+                  {
+                      response.json().then((jsonData) =>
+                                           {
+                                               console.log("generateQuizForTopic: jsonData: ", jsonData)
+
+                                               if('error' in jsonData)
+                                               {
+                                                   dispatch({
+                                                                type: 'POPUP_ERROR',
+                                                                payload: jsonData['error'],
+                                                            });
+                                               }
+                                               else
+                                               {
+                                                   setCurrentTopic(dispatch, jsonData['topic']);
+                                               }
+
+                                               closeLoadingDialog(dispatch);
+                                           });
+                  }
+              });
+};
+
+export const generateStudyGuideForTopic = (dispatch, topic_id) =>
+{
+    const url = '/topics/generate_study_guide';
+
+    POST(url, {'topic_id': topic_id})
+        .then((response) =>
+              {
+                  if(response.status === 200)
+                  {
+                      response.json().then((jsonData) =>
+                                           {
+
+                                               if('error' in jsonData)
+                                               {
+                                                   dispatch({
+                                                                type: 'POPUP_ERROR',
+                                                                payload: jsonData['error'],
+                                                            });
+                                               }
+                                               else
+                                               {
+                                                   setCurrentTopic(dispatch, jsonData['topic']);
+                                               }
+
+                                               closeLoadingDialog(dispatch);
+                                           });
+                  }
+              });
+};
+
+
 /*********************************************************************/
 /** These functions only exist for development. **********************/
 /*********************************************************************/

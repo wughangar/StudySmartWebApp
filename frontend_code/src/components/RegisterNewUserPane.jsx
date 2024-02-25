@@ -1,12 +1,12 @@
 import React from 'react';
 import {Button, Col, Container, Form, Row} from 'react-bootstrap';
-import {AppContext} from "./StoreProvider";
 import {registerUser} from "../common/backend_interface";
-import {popLastState, setCurrentUser, setCurrentView} from "../common/context_interface";
+import {setCurrentUser, setCurrentView} from "../common/context_interface";
+import {connect} from "react-redux";
 
 class RegisterNewUserPane extends React.Component
 {
-    static contextType = AppContext;
+
 
     constructor(props)
     {
@@ -42,14 +42,11 @@ class RegisterNewUserPane extends React.Component
            name.length > 0 &&
            email.length > 0)
         {
-            console.log("Accepted!")
-            registerUser(username, password, email, name).then(userObj => {
-                setCurrentUser(this.context, userObj)
-                setCurrentView(this.context, "default")
-            })
-            
+            console.log("Accepted!");
+            registerUser(this.props.dispatch, username, password, email, name)
+
         }
-        
+
     };
 
     render()
@@ -129,8 +126,12 @@ class RegisterNewUserPane extends React.Component
 
     onCancelClicked = () =>
     {
-        popLastState(this.context)
-    }
+        setCurrentView(this.props.dispatch, "login");
+    };
 }
 
-export default RegisterNewUserPane;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(RegisterNewUserPane);

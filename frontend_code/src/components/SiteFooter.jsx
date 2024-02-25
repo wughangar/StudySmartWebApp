@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
+import {connect} from "react-redux";
 
 class SiteFooter extends Component
 {
@@ -23,4 +24,8 @@ class SiteFooter extends Component
     }
 }
 
-export default SiteFooter;
+const mapStateToProps = state => ({
+    user: state.users.user,
+});
+
+export default connect(mapStateToProps)(SiteFooter);

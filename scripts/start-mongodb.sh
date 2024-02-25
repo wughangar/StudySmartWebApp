@@ -1,8 +1,10 @@
 #!/bin/bash
    
 THIS_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
-FRONTEND_DIR="$THIS_SCRIPT_DIR/frontend_code"
-MONGODB_DIR=$THIS_SCRIPT_DIR/.mongodb_data
+PROJECT_DIR=$(dirname "$THIS_SCRIPT_DIR")
+
+FRONTEND_DIR="$PROJECT_DIR/frontend_code"
+MONGODB_DIR=$PROJECT_DIR/.mongodb_data
 
 # Checking if npm command exists
 if ! command -v mongod &> /dev/null; then
