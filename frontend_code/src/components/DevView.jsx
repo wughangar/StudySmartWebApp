@@ -1,23 +1,12 @@
 import React from 'react';
 import {Button, Col, Container, Row} from 'react-bootstrap';
 import {setCurrentUser, setLoadingDialogStatus} from "../common/context_interface";
-import {getTestUserFromDB} from "../common/backend_interface";
 import {connect} from "react-redux";
 
 class DevView extends React.Component
 {
     SHOW = true;
 
-    devLoginBtnClicked = () =>
-    {
-        const testUser = getTestUserFromDB();
-        setCurrentUser(this.props.dispatch, testUser);
-    };
-
-    devLogoutBtnClicked = () =>
-    {
-        setCurrentUser(this.props.dispatch, null);
-    };
     clearBrowserDataClicked = () =>
     {
         window.localStorage.setItem('myContent', JSON.stringify({}));
@@ -86,24 +75,12 @@ class DevView extends React.Component
                     <Row>
                         <Col>
                             <Button className={'mx-1'}
-                                    onClick={this.devLoginBtnClicked}
-                                    disabled={this.props.user !== null}>DEV: Login</Button>
-
-                            <Button className={'mx-1'}
-                                    onClick={this.devLogoutBtnClicked}
-                                    disabled={this.props.user === null}>DEV: Logout</Button>
-
-                            <Button className={'mx-1'}
                                     onClick={this.clearBrowserDataClicked}>
                                 Clear Browser Data</Button>
 
                             <Button className={'mx-1'}
                                     onClick={this.testProgressClicked}>
                                 Test Progress Dialog</Button>
-
-                            <Button className={'mx-1'}
-                                    onClick={this.testLoadingDialogClicked}>
-                                Test Loading Dialog</Button>
 
                         </Col>
                     </Row>

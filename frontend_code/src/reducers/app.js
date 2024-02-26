@@ -24,6 +24,11 @@ export default (state = initialState, {type, payload}) =>
                 ...state,
                 popupError: payload,
             };
+        case "POP_QA":
+            return {
+                ...state,
+                popupQA: payload,
+            };
         case "SET_LOADING_DIALOG":
             return {
                 ...state,

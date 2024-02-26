@@ -9,14 +9,14 @@ class TopicsList extends React.Component
 {
     componentDidMount()
     {
-        getTopicsForUser(this.props.dispatch, this.props.user._id)
+        getTopicsForUser(this.props.dispatch, this.props.user._id);
     }
 
     onTopicClicked(topic)
     {
         setCurrentTopic(this.props.dispatch, topic);
     }
-    
+
     renderList()
     {
         const {user, currentTopic, topics} = this.props;
@@ -25,17 +25,17 @@ class TopicsList extends React.Component
         return topics.map((topic, index) =>
                           {
 
-                              let bgColor = "white";
+                              let bgColor = "#012";
 
-                              if(currentTopic != null && topic.topic_id === currentTopic.topic_id)
+                              if(currentTopic != null && topic._id === currentTopic._id)
                               {
                                   bgColor = "lightgreen";
                               }
 
                               return (
-                                  <ListGroup.Item
+                                  <ListGroup.Item className={'btn-sm pt-0 pb-0'}
                                       style={{cursor: "pointer", backgroundColor: bgColor}}
-                                      onMouseOver={(event) => event.currentTarget.style.backgroundColor = 'lightblue'}
+                                      onMouseOver={(event) => event.currentTarget.style.backgroundColor = '#224455'}
                                       onMouseOut={(event) => event.currentTarget.style.backgroundColor = bgColor}
                                       key={index}
                                       onClick={() => this.onTopicClicked(topic)}>
@@ -49,10 +49,10 @@ class TopicsList extends React.Component
     {
         if(!this.props.topics)
         {
-            return "No topics found."
+            return "No topics found.";
         }
-            
-        
+
+
         return (
             <Container fluid><Row>
                 <Col>
@@ -71,7 +71,7 @@ class TopicsList extends React.Component
 const mapStateToProps = state => ({
     user: state.users.user,
     currentTopic: state.topics.currentTopic,
-    topics: state.topics.topics
+    topics: state.topics.topics,
 });
 
 export default connect(mapStateToProps)(TopicsList);

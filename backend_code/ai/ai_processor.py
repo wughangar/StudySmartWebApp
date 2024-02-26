@@ -18,18 +18,13 @@ class AIProcessor:
             ai_response = response.choices[0].message.content
             return ai_response
         except Exception as e:
-            print("An error occured while sending messages to the AI: ", e)
+            print("An error occurred while sending messages to the AI: ", e)
             return None
 
     def generate_summary(self, topic_title):
         initial_message = {"role": "user",
                            "content": f"I want to learn about {topic_title}.  Please generate a summary for a beginner "
                                       f"that is a maximum of three paragraphs."}
-
-        return self._send_messages([initial_message])
-
-    def initiate_conversation(self, topic):
-        initial_message = {"role": "user", "content": f"I want to learn about {topic}"}
 
         return self._send_messages([initial_message])
 
@@ -42,7 +37,7 @@ class AIProcessor:
                 'chapters': [{'chapter_index': <chapter_number>,  'title': <chapter_title>' 'extra_description': <chapter_extra_description>
             }"""
 
-        messages = [{"role": "system", "content": "You are a helpful assistant."},
+        messages = [{"role": "system", "content": "You are a helpful teacher."},
                     {"role": "user", "content": instructions
                      }]
 
@@ -69,7 +64,7 @@ class AIProcessor:
             chapter and not for the whole topic.
         """
 
-        messages = [{"role": "system", "content": "You are a helpful assistant."},
+        messages = [{"role": "system", "content": "You are a helpful teacher."},
                     {"role": "user", "content": instructions
                      }]
 
@@ -77,24 +72,46 @@ class AIProcessor:
 
         return chapter_body
 
-    def generate_quiz_questions(self, topic):
+    def generate_quiz_questions(self, topic, chapter_index=None):
         print_json(fix_mongodb_record_for_jsonify(topic))
 
-        instructions = f"""Generate 10 multiple choice quiz questions with several hints each 
-            for {topic['title']} stored in a JSON object printed in a markdown code block.  Do not respond with 
-            anything but a json object in a markdown code block. It should have the format""" + """
-            {
-                'question': <question text>, 
-                'answer_choices': [<answer choice 1>,<answer choice 2>, <answer choice 3>,<answer choice 4>], 
-                'hints': [<hint text>, <hint text>, ...]
-            }"""
+        if chapter_index is not None:
+            print("Generating quiz questions for a CHAPTER!")
+            instructions = f"""Generate 10 multiple choice quiz questions with several hints each 
+                for the topic "{topic['title']}".    
+                
+                It must be stored in a JSON object that is printed in a markdown 
+                
+                code block.  Do not respond with anything but a json object in a markdown code block. It should have the format""" + """
+                {
+                    'question': <question text>, 
+                    'answer_choices': [<answer choice 1>,<answer choice 2>, <answer choice 3>,<answer choice 4>], 
+                    'answer_index': <answer_choices index>,
+                    'hints': [<hint text>, <hint text>, ...]
+                }
+                
+                The questions should pertain to the following chapter text of the aforementioned topic (or closely 
+                related):
+                """ + topic['study_guide']['chapters'][chapter_index]['body']
+        else:
+            print("Generating quiz questions for a TOPIC!")
+
+            instructions = f"""Generate 10 multiple choice quiz questions with several hints each 
+                for the topic "{topic['title']}".  It must be stored in a JSON object that is printed in a markdown 
+                code block.  Do not respond with anything but a json object in a markdown code block. It should have the format""" + """
+                {
+                    'question': <question text>, 
+                    'answer_choices': [<answer choice 1>,<answer choice 2>, <answer choice 3>,<answer choice 4>],
+                    'answer_index': <answer_choices index>, 
+                    'hints': [<hint text>, <hint text>, ...]
+                }"""
 
         if len(topic['quiz_questions']) > 0:
             questions_list = map(lambda x: x['question'], topic['quiz_questions'])
             existing_questions = "\n".join(questions_list)
             instructions += f"\nI already have the following questions, so do not use them: {existing_questions}"
 
-        messages = [{"role": "system", "content": "You are a helpful assistant."},
+        messages = [{"role": "system", "content": "You are a helpful teacher."},
                     {"role": "user", "content": instructions}]
 
         response = self._send_messages(messages)
@@ -106,11 +123,37 @@ class AIProcessor:
 
         return questions
 
-    def explain_topic(self, topic):
-        messages = [{"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"Explain {topic}."}]
+    def ask_topic_question(self, topic, question, chapter_index=None):
+        if chapter_index is not None:
+            print("Generating chapter QA")
+
+            instructions = f"""Generate an answer to the following question within the context of the topic of  "{topic['title']}".    
+                The only text returned should be the answer, skip the politeness.  Use several paragraphs if 
+                necessary.  The questions 
+                should pertain to 
+                the following chapter text of the aforementioned topic (or closely 
+                related):
+                """ + topic['study_guide']['chapters'][chapter_index]['body'] + f"""
+                    Use markdown.  Here is the question for you to answer:
+                    
+                    "{question}"
+                """
+
+        else:
+            print("Generating topic QA")
+
+            instructions = (f"""Generate an answer to the following question within the context of the topic of  "{topic['title']}".  """ + 
+                            f"""The only text returned should be the answer, skip the politeness.  Use several paragraphs if 
+                necessary.   Use markdown.  Here is the question 
+                            for you to answer: 
+                            "{question}" """)
+
+
+        messages = [{"role": "system", "content": "You are a helpful teacher."},
+                    {"role": "user", "content": instructions}]
 
         return self._send_messages(messages)
-
+        
+        
 
 ai_processor = AIProcessor(OPENAI_API_KEY)

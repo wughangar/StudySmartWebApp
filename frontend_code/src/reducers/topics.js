@@ -1,8 +1,10 @@
 const initialState = {
     currentTopic: null,
+    currentTopicChapter: null,
+    currentTopicQA: null,
     topicSummaries: [],
     quiz: null,
-    studyGuide: null
+    studyGuide: null,
 };
 
 export default (state = initialState, {type, payload}) =>
@@ -15,6 +17,8 @@ export default (state = initialState, {type, payload}) =>
                 currentTopic: payload,
                 quiz: null,
                 studyGuide: null,
+                currentTopicChapter: null,
+                currentTopicQA: null,
             };
             return state;
 
@@ -49,7 +53,20 @@ export default (state = initialState, {type, payload}) =>
                 };
             }
             return state;
+        case 'SET_TOPIC_CHAPTER':
+            state = {
+                ...state,
+                currentTopicChapter: payload,
+            };
 
+            return state;
+        case 'SET_TOPIC_QA':
+            state ={
+                ...state,
+                currentTopicQA: payload
+            }
+            
+            return state;
         default:
             return state;
 

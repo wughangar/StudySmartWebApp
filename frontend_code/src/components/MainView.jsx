@@ -11,13 +11,16 @@ import SiteFooter from "./SiteFooter";
 import ProgressDialog from "./ProgressDialog";
 import {connect} from "react-redux";
 import LoadingDialog from "./LoadingDialog";
+import {setLoadingDialogStatus, setTopicQA} from "../common/context_interface";
+import PopupQADialog from "./PopQADialog";
 
 
 class MainView extends Component
 {
-    // Update local state when context changes
     componentDidMount()
     {
+        setLoadingDialogStatus(this.props.dispatch, null)
+        setTopicQA(this.props.dispatch, null)
     }
 
     componentDidUpdate(prevProps, newProps, something)
@@ -30,6 +33,7 @@ class MainView extends Component
                                 type: "SET_PROGRESS",
                                 payload: null,
                             });
+
     };
 
     render()
@@ -84,6 +88,7 @@ class MainView extends Component
             <Container fluid>
                 {loadingDialog}
                 {progressElement}
+                <PopupQADialog question={this.props.currentTopicQA}/>
                 <Row className="mb-1">
                     <Col>
                         <SiteHeader/>
@@ -117,6 +122,7 @@ const mapStateToProps = state => ({
     currentView: state.app.currentView,
     progress: state.app.progress,
     loadingDialogStatus: state.app.loadingDialogStatus,
+    currentTopicQA: state.topics.currentTopicQA
 });
 
 export default connect(mapStateToProps)(MainView);

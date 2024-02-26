@@ -13,7 +13,7 @@ export const setCurrentUser = (dispatch, userObj) =>
 
 export const setCurrentTopic = (dispatch, topic) =>
 {
-    console.log("SETTING THE TOPIC: ", topic)
+    console.log("SETTING THE TOPIC: ", topic);
     dispatch(
         {
             type: "SET_TOPIC",
@@ -88,7 +88,7 @@ export const setLoadingDialogStatus = (dispatch, statusText) =>
             payload: statusText,
         },
     );
-}
+};
 
 export const closeLoadingDialog = (dispatch) =>
 {
@@ -98,4 +98,28 @@ export const closeLoadingDialog = (dispatch) =>
             payload: null,
         },
     );
-}
+};
+
+export const setTopicChapter = (dispatch, topicChapter) =>
+{
+    console.log("Setting chapter: ", topicChapter)
+    dispatch(
+        {
+            type: "SET_TOPIC_CHAPTER",
+            payload: topicChapter,
+        },
+    );
+
+};
+
+export const setTopicQA = (dispatch, question) =>
+{
+    console.log("Setting chapter QA: ", question)
+    dispatch(
+        {
+            type: "SET_TOPIC_QA",
+            payload: question,
+        },
+    );
+
+};

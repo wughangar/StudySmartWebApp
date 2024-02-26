@@ -3,13 +3,14 @@ import {Col, Container, Row} from 'react-bootstrap';
 import TopicsList from "./TopicsList";
 import {logout, setCurrentView} from "../common/context_interface";
 import {connect} from "react-redux";
+import AIChatBoxView from "./AIChatBoxView";
 
 class SiteSidebar extends React.Component
 {
     render()
     {
         const {user} = this.props;
-        
+
         return (
             <Container fluid className="card card-body mt-2">
                 <Row>
@@ -20,12 +21,20 @@ class SiteSidebar extends React.Component
                     </Col>
                 </Row>
                 <Row>
-                    <Col className="text-center">
-                        <a className={'link-primary'} href="#" onClick={this.onAddNewTopicClicked}>Add new topic...</a>
+                    <Col>
+                        <AIChatBoxView/>
+                        <hr className="bg-primary" style={{height: '4px'}}/>
                     </Col>
                 </Row>
-                <Row >
+                <Row className={'mt-0'}>
+                    <Col className="text-center">
+                        Ready to learn something new?<br/> <a className={'link-primary'} href="#" onClick={this.onAddNewTopicClicked}>Click here to create a new topic!</a>
+                        <hr className="bg-primary" style={{height: '4px'}}/>
+                    </Col>
+                </Row>
+                <Row>
                     <Col>
+                        <p className='fw-bolder text-primary text-center'>Your Topics</p>
                         <TopicsList/>
                     </Col>
                 </Row>
@@ -35,7 +44,7 @@ class SiteSidebar extends React.Component
 
     onAddNewTopicClicked = () =>
     {
-        setCurrentView(this.props.dispatch,  "createNewTopic");
+        setCurrentView(this.props.dispatch, "createNewTopic");
     };
 
     onLogoutClicked = () =>

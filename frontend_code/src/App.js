@@ -5,9 +5,11 @@ import MainView from './components/MainView';
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider} from "react-redux";
 import {persistor, store} from "./reducers/index";
+import {setLoadingDialogStatus} from "./common/context_interface";
 
 class App extends React.Component
 {
+
     render()
     {
         return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Col, Container, FormControl, Row} from 'react-bootstrap';
-import {askAI, createNewTopic, generateSummaryForTopic} from "../common/backend_interface";
+import {createNewTopic, generateSummaryForTopic} from "../common/backend_interface";
 import {
     insertTopicSummary,
     removeTopicSummary,
