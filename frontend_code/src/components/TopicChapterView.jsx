@@ -29,7 +29,7 @@ class TopicStudyGuideChapterView extends React.Component
             return "No questions.";
         }
 
-        return <TopicQuizView questions={this.props.currentTopicChapter.quiz_questions}/>
+        return <TopicQuizView dispatch={this.props.dispatch} topic={this.props.currentTopic}  max={10} questions={this.props.currentTopicChapter.quiz_questions}/>
     };
 
 

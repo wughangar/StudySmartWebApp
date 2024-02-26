@@ -1,6 +1,8 @@
 import React from 'react';
 import {Alert, Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {ChatDotsFill} from "react-bootstrap-icons";
+import {askTopicQuestion} from "../common/backend_interface";
+import {setLoadingDialogStatus} from "../common/context_interface";
 
 class TopicQuizView extends React.Component
 {
@@ -38,6 +40,8 @@ class TopicQuizView extends React.Component
     onExplainQuestion = (e, question_index) =>
     {
         console.log(`Explaining question: ${question_index}`)
+        setLoadingDialogStatus(this.props.dispatch, "Asking question...")
+        askTopicQuestion(this.props.dispatch, this.props.topic._id, this.props.questions[question_index].question)
     };
 
     render()
@@ -45,7 +49,7 @@ class TopicQuizView extends React.Component
         const {currentQuestionIndex, userAnswers, checkedValue} = this.state;
         const currentQuestion                                   = this.props.questions[currentQuestionIndex];
 
-        if(currentQuestionIndex >= this.props.questions.length)
+        if(currentQuestionIndex >= this.props.questions.length || (this.props.max && currentQuestionIndex >= this.props.max))
         {
             // Quiz ended
             let correctAnswers   = [];
@@ -97,7 +101,7 @@ class TopicQuizView extends React.Component
                     <Row>
                         <Col>
                             <Alert variant="primary">
-                                Your score: {score}/{this.props.questions.length}
+                                Your score: {score}/{this.props.max ? this.props.max : this.props.questions.length}
                             </Alert>
                         </Col>
                     </Row>

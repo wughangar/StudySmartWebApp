@@ -3,7 +3,7 @@ import {
     insertTopicSummary,
     setCurrentTopic,
     setCurrentUser,
-    setCurrentView,
+    setCurrentView, setLoadingDialogStatus,
     setTopicQA,
     setTopicsList,
 } from "./context_interface";
@@ -296,6 +296,8 @@ export const askTopicQuestion = (dispatch, topic_id, question, chapter_index = n
                             question,
                             answer: jsonData['answer'],
                         });
+                        
+                        setLoadingDialogStatus(dispatch, null)
                     });
 
             }

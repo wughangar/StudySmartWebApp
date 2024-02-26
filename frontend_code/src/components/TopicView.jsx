@@ -6,6 +6,7 @@ import {setLoadingDialogStatus, setTopicChapter} from "../common/context_interfa
 import TopicChapterView from "./TopicChapterView";
 import ChaptersList from './TopicChapterList';
 import ReactMarkdown from "react-markdown";
+import TopicQuizView from "./TopicQuizView";
 
 const QuizQuestion = ({question_index, quiz}) =>
 {
@@ -14,7 +15,7 @@ const QuizQuestion = ({question_index, quiz}) =>
     return (<div className="card">
         <div className="card-body">
             <h5 className="card-title">{question}</h5>
-            {answer_choices.map((choice, index) => (<div key={index} className="form-check">
+            {answer_choices.map((choice, index) => (<div key={`${choice}-${index}`} className="form-check">
                 <input className="form-check-input" type="radio" name="quizChoice"
                        id={`choice-${question_index}-${index}`}
                        value={choice}/>
@@ -88,7 +89,7 @@ class TopicView extends React.Component
 
     generateTabView = () =>
     {
-        const numQA = this.props.currentTopic.qa_questions?this.props.currentTopic.qa_questions.length:0;
+        const numQA = this.props.currentTopic.qa_questions ? this.props.currentTopic.qa_questions.length : 0;
         return (<Row>
             <Col>
                 <Nav variant="pills" defaultActiveKey="#">
@@ -145,54 +146,62 @@ class TopicView extends React.Component
 
         if(!studyGuide || !studyGuide.chapters)
         {
-            return (
-                <Row>
-                    <Col>
-                        <Button variant="primary" onClick={this.onGenerateStudyGuideClicked}>Generate a Study
-                            Guide!</Button>
-                    </Col>
-                </Row>);
+            return (<Row>
+                <Col>
+                    <Button variant="primary" onClick={this.onGenerateStudyGuideClicked}>Generate a Study
+                        Guide!</Button>
+                </Col>
+            </Row>);
         }
 
         if(this.props.currentTopicChapter)
         {
-            return (
-                <Row>
-                    <Col>
-                        <TopicChapterView/>
-                    </Col>
-                </Row>);
-        }
-
-        return (
-            <Row>
+            return (<Row>
                 <Col>
-                    <ChaptersList dispatch={this.props.dispatch} topic={currentTopic}/>
+                    <TopicChapterView/>
                 </Col>
             </Row>);
+        }
+
+        return (<Row>
+            <Col>
+                <ChaptersList dispatch={this.props.dispatch} topic={currentTopic}/>
+            </Col>
+        </Row>);
     };
 
     generateTab_Quiz = () =>
     {
         const {currentTopic} = this.props;
-        const quizQuestions  = currentTopic.quiz_questions;
+        let quizQuestions    = null;
 
-        const questionElements = quizQuestions.map((qa, index) =>
-                                                   {
-                                                       return (<QuizQuestion question_index={index} quiz={qa}/>);
-                                                   });
+        console.log("CURRENT TOPIC: ", currentTopic);
+        if(currentTopic && currentTopic.study_guide && currentTopic.study_guide.chapters)
+        {
+            const chapters = currentTopic.study_guide.chapters;
 
-        const btnText = quizQuestions.length > 0 ? "Generate More!" : "Generate a Quiz!";
+            const filteredChapters = chapters.filter(
+                (chapter) => chapter.quiz_questions && chapter.quiz_questions.length > 0);
+            
+            console.log("FILTERED: ", filteredChapters)
+            quizQuestions = filteredChapters.map((chapter) =>
+                                                 {
+                                                     return chapter.quiz_questions;
+                                                 }).flat();
+
+        }
+        
+        console.log("quizQuestions: ", quizQuestions)
+
+        if(!quizQuestions || quizQuestions.length === 0)
+        {
+            return null;
+        }
 
         return (<>
             <Row>
                 <Col>
-                    {questionElements}
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <Button variant="primary" onClick={this.onGenerateQuizClicked}>{btnText}</Button>
+                    <TopicQuizView dispatch={this.props.dispatch}  topic={this.props.currentTopic} questions={quizQuestions} max={10}/>
                 </Col>
             </Row>
         </>);
@@ -204,23 +213,22 @@ class TopicView extends React.Component
         {
             return null;
         }
-        
-        console.log("this.props.currentTopic: ", this.props.currentTopic)
-        
-        const rows = this.props.currentTopic.qa_questions.map(
-            (qa, idx) =>
-            {
-                return (
-                    <Container fluid className={' mt-2'}>
-                        <Row className={'text-warning bg-black'}>
-                            <Col >Q: {qa.question}</Col>
-                        </Row>
-                        <Row className={'card-body text-primary bg-secondary'}>
-                            <Col ><ReactMarkdown>{qa.answer}</ReactMarkdown></Col>
-                        </Row>
-                    </Container>);
 
-            });
+        console.log("this.props.currentTopic: ", this.props.currentTopic);
+
+        const rows = this.props.currentTopic.qa_questions.map((qa, idx) =>
+                                                              {
+                                                                  return (<Container fluid className={' mt-2'}>
+                                                                      <Row className={'text-warning bg-black'}>
+                                                                          <Col>Q: {qa.question}</Col>
+                                                                      </Row>
+                                                                      <Row
+                                                                          className={'card-body text-primary bg-secondary'}>
+                                                                          <Col><ReactMarkdown>{qa.answer}</ReactMarkdown></Col>
+                                                                      </Row>
+                                                                  </Container>);
+
+                                                              });
 
         return rows;
     };

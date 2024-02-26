@@ -72,7 +72,10 @@ def generate_quiz_questions():
     data = request.get_json()
     topic_id = data['topic_id']
     chapter_index = data['chapter_index'] if 'chapter_index' in data else None
-    chapter_index -= 1;
+    
+    if chapter_index is not None:
+        chapter_index -= 1
+    
     try:
         topic = topics_collection.find_one({'_id': ObjectId(topic_id)})
 
