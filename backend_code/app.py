@@ -32,11 +32,6 @@ mail = Mail(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(topics_bp)
 
-# app.register_blueprint(goals_bp)
-# app.register_blueprint(summary_bp)
-# app.register_blueprint(daily_tweet_bp)
-# app.register_blueprint(users_bp)
-
 
 if __name__ == '__main__':
     app.run(debug=True)

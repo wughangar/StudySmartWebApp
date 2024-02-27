@@ -18,24 +18,24 @@ class LoginPane extends React.Component
             errorMsg: null,
         };
 
-        this.handleUsernameChange = this.handleUsernameChange.bind(this);
-        this.handlePasswordChange = this.handlePasswordChange.bind(this);
-        this.handleSubmit         = this.handleSubmit.bind(this);
+        this.onUsernameChange = this.onUsernameChange.bind(this);
+        this.onPasswordChange = this.onPasswordChange.bind(this);
+        this.onSubmit         = this.onSubmit.bind(this);
     }
 
-    handleUsernameChange(event)
+    onUsernameChange(event)
     {
         this.setState({...this.state, username: event.target.value});
     }
 
-    handlePasswordChange(event)
+    onPasswordChange(event)
     {
         this.setState({...this.state, password: event.target.value});
     }
 
-    handleSubmit(event)
+    onSubmit(event)
     {
-        // event.preventDefault();
+        event.preventDefault();
         const {username, password} = this.state;
 
         if(loginUser(this.props.dispatch, username, password))
@@ -55,6 +55,11 @@ class LoginPane extends React.Component
         }
     }
 
+    onRegisterClicked = () =>
+    {
+        setCurrentView(this.props.dispatch, "register");
+    };
+    
     render()
     {
         const {username, password, errorMsg} = this.state;
@@ -73,14 +78,14 @@ class LoginPane extends React.Component
             <Container className={'card card-body mt-5'}>
                 <Row>
                     <Col>
-                        <Form onSubmit={this.handleSubmit}>
+                        <Form onSubmit={this.onSubmit}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Username</Form.Label>
-                                <Form.Control type="text" onChange={this.handleUsernameChange} value={username}/>
+                                <Form.Control type="text" onChange={this.onUsernameChange} value={username}/>
                             </Form.Group>
                             <Form.Group className="mb-3">
                                 <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" onChange={this.handlePasswordChange} value={password}/>
+                                <Form.Control type="password" onChange={this.onPasswordChange} value={password}/>
                             </Form.Group>
                             <Button variant="primary" type="submit" disabled={!submitButtonEnabled}>Submit</Button>
                             &nbsp;&nbsp;&nbsp;Or <a href={"#"} onClick={this.onRegisterClicked}>Register</a>...
@@ -93,10 +98,6 @@ class LoginPane extends React.Component
         );
     }
 
-    onRegisterClicked = () =>
-    {
-        setCurrentView(this.props.dispatch, "register");
-    };
 }
 
 const mapStateToProps = state => ({

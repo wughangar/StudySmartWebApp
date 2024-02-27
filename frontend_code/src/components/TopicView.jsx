@@ -7,6 +7,8 @@ import TopicChapterView from "./TopicChapterView";
 import ChaptersList from './TopicChapterList';
 import ReactMarkdown from "react-markdown";
 import TopicQuizView from "./TopicQuizView";
+import TopicQAView from "./TopicQAView";
+import TopicStudyGuideView from "./TopicStudyGuideView";
 
 const QuizQuestion = ({question_index, quiz}) =>
 {
@@ -74,19 +76,6 @@ class TopicView extends React.Component
                       });
     };
 
-    onGenerateQuizClicked = () =>
-    {
-        setLoadingDialogStatus(this.props.dispatch, "Generating quiz...");
-        generateQuizForTopic(this.props.dispatch, this.props.currentTopic._id);
-    };
-
-    onGenerateStudyGuideClicked = () =>
-    {
-        setLoadingDialogStatus(this.props.dispatch, "Generating study guide...");
-        generateStudyGuideForTopic(this.props.dispatch, this.props.currentTopic._id);
-    };
-
-
     generateTabView = () =>
     {
         const numQA = this.props.currentTopic.qa_questions ? this.props.currentTopic.qa_questions.length : 0;
@@ -139,35 +128,7 @@ class TopicView extends React.Component
 
     generateTab_StudyGuide = () =>
     {
-        const {currentTopic} = this.props;
-
-        console.log("The current topic: ", currentTopic);
-        const studyGuide = currentTopic.study_guide;
-
-        if(!studyGuide || !studyGuide.chapters)
-        {
-            return (<Row>
-                <Col>
-                    <Button variant="primary" onClick={this.onGenerateStudyGuideClicked}>Generate a Study
-                        Guide!</Button>
-                </Col>
-            </Row>);
-        }
-
-        if(this.props.currentTopicChapter)
-        {
-            return (<Row>
-                <Col>
-                    <TopicChapterView/>
-                </Col>
-            </Row>);
-        }
-
-        return (<Row>
-            <Col>
-                <ChaptersList dispatch={this.props.dispatch} topic={currentTopic}/>
-            </Col>
-        </Row>);
+        return <TopicStudyGuideView/>
     };
 
     generateTab_Quiz = () =>
@@ -213,24 +174,8 @@ class TopicView extends React.Component
         {
             return null;
         }
-
-        console.log("this.props.currentTopic: ", this.props.currentTopic);
-
-        const rows = this.props.currentTopic.qa_questions.map((qa, idx) =>
-                                                              {
-                                                                  return (<Container fluid className={' mt-2'}>
-                                                                      <Row className={'text-warning bg-black'}>
-                                                                          <Col>Q: {qa.question}</Col>
-                                                                      </Row>
-                                                                      <Row
-                                                                          className={'card-body text-primary bg-secondary'}>
-                                                                          <Col><ReactMarkdown>{qa.answer}</ReactMarkdown></Col>
-                                                                      </Row>
-                                                                  </Container>);
-
-                                                              });
-
-        return rows;
+        
+        return <TopicQAView questions={this.props.currentTopic.qa_questions}/>
     };
 
     generateTab_Summary()
