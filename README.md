@@ -18,10 +18,15 @@ It combines essential features with advanced functionalities to create a seamles
   with their followers on Twitter directly from the app.
 -  Study Goals: Users can set specific study goals for each day and week, helping them stay focused and track their 
   progress over time.
+-Quizes: Users are able to generate quzes based on what they are learning
+- Ability to remove summaries if not needed and to regenerate them before proceding with the studies.
+
 - Reminders: Customizable reminders ensure that users never miss important study sessions or deadlines, enhancing 
    productivity and time management.
 - Random Learning Facts: Engages users with interesting and educational facts randomly generated to stimulate 
   curiosity and encourage continuous learning.
+
+- Study Guides: the web application is able to develop chapters that guide the users on what to learn based on a given topic.
 
 # Technical Composition
 
